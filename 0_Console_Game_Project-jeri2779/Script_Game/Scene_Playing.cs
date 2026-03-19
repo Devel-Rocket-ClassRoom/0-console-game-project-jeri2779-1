@@ -22,12 +22,13 @@ public class Playing : Scene
     public event GameAction OnPlayAgain;  // 다시 시작 이벤트
     public event GameAction OnGameOver;   // 게임 오버 이벤트
 
-    private int _state = 1;
-    private const int MaxState = 5;
     private StagePhase _phase = StagePhase.Waiting;
-    private float _resultTimer = 0f;
-    private const float _resultDuration = 3f; // 결과 화면 지속 시간 (초)
-    private int _stageScore = 0; // 스테이지 점수
+    private float _phaseTimer = 0f;          // 대기 시간용 타이머
+
+    private int _currentStage = 1;           // 현재 스테이지 번호
+    private int _currentWave = 0;            // 현재 웨이브 번호
+    private int _killCount = 0;
+    private int _stageScore = 0;             // 스테이지 점수
 
     private enum StagePhase
     {
@@ -130,7 +131,7 @@ public class Playing : Scene
                     //체력 시스템을 구현할시 remove를 다른곳에서 하고 대신 대미지 관련 로직을 넣을수도 있음
                     RemoveGameObject(enemy);
                     score += 10;
-                    break;
+                    break;                  // 한 총알이 여러 적과 충돌하는 것을 방지하기 위해 내부 루프 탈출
                 }
             }
         }
