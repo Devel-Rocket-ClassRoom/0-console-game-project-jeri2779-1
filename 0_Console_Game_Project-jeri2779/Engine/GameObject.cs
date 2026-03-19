@@ -9,7 +9,7 @@ namespace Framework.Engine
         public Scene Scene { get; }                 // 오브젝트가 속한 씬
 
         //좌표   프로퍼티 추가
-        public float X { get; protected set; }                // X 좌표
+        public float X { get; protected set; }                  // X 좌표
         public float Y { get; protected set; }                  // Y 좌표
 
         protected GameObject(Scene scene) // 생성자에서 씬 참조를 받아 초기화

@@ -7,16 +7,20 @@ using Framework.Engine;
 //{
 internal class Wall : GameObject
 {
-    public static int Left   { get; private set; } = 1; 
-    public static int Right  { get; private set; } = 38;   
-    public static int Top    { get; private set; } = 3;  
-    public static int Bottom { get; private set; } = 17;    
+    public static int Left   { get; private set; }  
+    public static int Right  { get; private set; }  
+    public static int Top    { get; private set; }     
+    public static int Bottom { get; private set; }
 
    
 
-    public Wall(Scene scene) : base(scene)
+    public Wall(Scene scene, int width, int height) : base(scene)
     {
         Name = "Wall";
+        Left = 1;
+        Top = 3;
+        Right = width - 2;//
+        Bottom = height - 2;
     }
 
     public override void Draw(ScreenBuffer buffer)
