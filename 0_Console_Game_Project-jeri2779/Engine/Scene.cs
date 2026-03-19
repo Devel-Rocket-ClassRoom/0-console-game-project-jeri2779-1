@@ -93,6 +93,26 @@ namespace Framework.Engine
             return null;
         }
 
+        public List<GameObject> FindGameObjectsAll(string name)
+        {
+            var result = new List<GameObject>();
+            for (int i = 0; i < _gameObjects.Count; i++)
+            {
+                if (_gameObjects[i].Name == name)
+                {
+                    result.Add(_gameObjects[i]);
+                }
+            }
+            for(int i = 0; i < _pendingAdd.Count; i++)
+            {
+                if (_pendingAdd[i].Name == name)
+                {
+                    result.Add(_pendingAdd[i]);
+                }
+            }
+            return result;
+        }
+
         private void FlushPending() // 대기 중인 게임 오브젝트를 처리
         {
             if (_pendingRemove.Count > 0)
