@@ -15,6 +15,10 @@ internal class Bullet : GameObject
 
     private float _dirX, _dirY;                                 // 총알 이동 방향 벡터
 
+    public float X => _x;
+    public float Y => _y;
+     
+
 
     public Bullet(Scene scene, float x, float y, float dirX, float dirY, string name) : base(scene)
     {
@@ -33,19 +37,45 @@ internal class Bullet : GameObject
         _x += (_speed * _dirX) * deltaTime;                                  // 총알이 X 방향으로 이동
         _y += (_speed * _dirY) * deltaTime;                                  // 총알이 Y 방향으로 이동
        
-        if(_y < 0)
+        if(_y < 0 || _y > Wall.Bottom + 2 || _x < 0 || _x > Wall.Right + 2)
         {
             Scene.RemoveGameObject(this);                                         // 총알 제거
             return;
         }
 
+        if (Name == "Player_Bullet")
+        {
+            var enemy = Scene.FindGameObject("Enemy") as Enemy;                    // 총알과 충돌하는 적 찾기
+            if (enemy != null && IsCollision(enemy.X, enemy.Y))
+            {
+                Scene.RemoveGameObject(enemy);                                       // 적 제거
+                
+                return;                                        // 총알 제거
+            }
+        }
+        else if (Name == "Enemy_Bullet")
+        { 
+            var player = Scene.FindGameObject("Player") as Player;        // 총알과 충돌하는 플레이어 찾기
+            if (player != null && IsCollision(player.X, player.Y))
+            {
+                Scene.RemoveGameObject(player);                                       // 플레이어 제거
+                return;                                         // 총알 제거
+            }
+        }
+        //충돌 판정은 되나 매 프레임 체크하기때문에 성능상 효율적이지 않음
+        //
          
     }
-
     public bool IsCollision(float targetX, float targetY)                     // 총알과 플레이어 또는 적의 충돌 여부 확인
     {
-        return targetX == _x && targetY == _y;
+        return (int)targetX == (int)_x && (int)targetY == (int)_y;
     }
+
+    //public bool IsCollision(float targetX, float targetY)                     // 총알과 플레이어 또는 적의 충돌 여부 확인
+    //{
+    //    return targetX == _x && targetY == _y;
+    //}
+
 
 
     public override void Draw(ScreenBuffer buffer)  
@@ -57,7 +87,7 @@ internal class Bullet : GameObject
         }
         else if (Name == "Enemy_Bullet")
         {
-            buffer.SetCell((int)_x, (int)_y, 'v', ConsoleColor.White);             // 적 총알은 빨간색으로 표시
+            buffer.SetCell((int)_x, (int)_y, '.', ConsoleColor.White);             // 적 총알은 빨간색으로 표시
 
         }
     }

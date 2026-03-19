@@ -16,7 +16,12 @@ class Enemy : GameObject
     private float _targetPos = 5;
 
     private float _shootTimer;
-    private float _shootInterval = 1.5f; // 총알 발사 간격 (초)
+    private float _shootInterval = 3.0f; // 총알 발사 간격 (초)
+
+    public float X => _posX;  
+    public float Y => _posY;
+
+
 
     // 적이 이동할 목표 위치
     public Enemy(Scene scene, float startX, float startY) : base(scene)

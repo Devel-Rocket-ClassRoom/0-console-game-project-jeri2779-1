@@ -72,7 +72,7 @@ namespace Framework.Engine
             }
         }
 
-        public GameObject FindGameObject(string name)
+        public GameObject FindGameObject(string name)  // 이름으로 게임 오브젝트 찾기
         {
             for (int i = 0; i < _gameObjects.Count; i++)
             {

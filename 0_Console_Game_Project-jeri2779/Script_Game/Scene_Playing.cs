@@ -11,11 +11,11 @@ public class Playing : Scene
     private Player player;                // 플레이어 오브젝트
     private Enemy enemy;                  // 적 오브젝트
 
-    private List<Enemy> enemies = new List<Enemy>();
-    private List<Bullet> bullets = new List<Bullet>();
+   
 
 
     private int life;                     // 생명 변수
+    private int score;                    // 점수 변수
     private bool isGameOver;              // 게임 오버 상태 변수
 
     public event GameAction OnPlayAgain;  // 다시 시작 이벤트
@@ -26,6 +26,7 @@ public class Playing : Scene
         // 게임 씬 그리기 로직 
         DrawGameObjects(buffer);
         buffer.WriteText(1, 0, $"life: {life}", ConsoleColor.Cyan); // 점수 표시 
+        buffer.WriteText(1,10, $"score: {score}", ConsoleColor.Green); // 점수 표시
         
 
         if (isGameOver)
@@ -44,12 +45,11 @@ public class Playing : Scene
         AddGameObject(wall);
         player = new Player(this, 20, 10);
         AddGameObject(player);
-        enemy = new Enemy(this, 20, 0);
-        AddGameObject(enemy);
         enemy = new Enemy(this, 10, 0);
         AddGameObject(enemy);
         enemy = new Enemy(this, 30, 0);
         AddGameObject(enemy);
+
 
         //throw new NotImplementedException();
     }
@@ -66,7 +66,7 @@ public class Playing : Scene
 
         if (isGameOver)
         {
-            if (Input.IsKeyDown(ConsoleKey.Enter)) 
+            if (Input.IsKeyDown(ConsoleKey.Enter))
             {
                 isGameOver = false;
                 OnPlayAgain?.Invoke();
@@ -76,26 +76,9 @@ public class Playing : Scene
 
         UpdateGameObjects(deltaTime); // ← 주석 해제: 플레이어 Update/HandleInput 호출됨
 
-        if (wall.IsCollision(player))   // 벽과 충돌여부 확인
-        {
-            //isGameOver = true;
-            //return;
-
-        }
-        foreach (var enemy in enemies)
-        {
-            if (enemy.IsCollision(player))  // 적과 충돌여부 확인
-            {
-                life--;
-                if (life <= 0)
-                {
-                    isGameOver = true;
-                    OnGameOver?.Invoke();
-                }
-                return;
-            }
-        }
-
+      
     }
-}
+
+         
+}       
 
