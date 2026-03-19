@@ -11,6 +11,9 @@ public class Playing : Scene
     private Player player;                // 플레이어 오브젝트
     private Enemy enemy;                  // 적 오브젝트
 
+    private List<Enemy> enemies = new List<Enemy>();
+    private List<Bullet> bullets = new List<Bullet>();
+
 
     private int life;                     // 생명 변수
     private bool isGameOver;              // 게임 오버 상태 변수
@@ -41,7 +44,11 @@ public class Playing : Scene
         AddGameObject(wall);
         player = new Player(this, 20, 10);
         AddGameObject(player);
-        enemy = new Enemy(this, 1, 0);
+        enemy = new Enemy(this, 20, 0);
+        AddGameObject(enemy);
+        enemy = new Enemy(this, 10, 0);
+        AddGameObject(enemy);
+        enemy = new Enemy(this, 30, 0);
         AddGameObject(enemy);
 
         //throw new NotImplementedException();
@@ -56,7 +63,7 @@ public class Playing : Scene
     {
         if (isGameOver)
         {
-            if (Input.IsKeyDown(ConsoleKey.Enter))
+            if (Input.IsKeyDown(ConsoleKey.Enter)) 
             {
                 isGameOver = false;
                 OnPlayAgain?.Invoke();
@@ -71,6 +78,19 @@ public class Playing : Scene
             isGameOver = true;
             return;
 
+        }
+
+        var playerBullet = FindGameObject("Player_Bullet") as Bullet;
+        if (playerBullet != null && enemy.IsCollision(playerBullet.X, playerBullet.Y)) // 총알과 충돌여부 확인
+        {
+            RemoveGameObject(enemy);
+            RemoveGameObject(playerBullet);
+            life--;
+            if (life <= 0)
+            {
+                isGameOver = true;
+                OnGameOver?.Invoke();
+            }
         }
      
     }

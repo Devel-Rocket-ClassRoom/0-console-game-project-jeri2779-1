@@ -1,4 +1,4 @@
-﻿using _0_Console_Game_Project_jeri2779.Script_Game;
+﻿ 
 using Framework.Engine;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ class Enemy : GameObject
     private float _targetPos = 5;
 
     private float _shootTimer;
-    private float _shootInterval;
+    private float _shootInterval = 0.4f; // 총알 발사 간격 (초)
 
     // 적이 이동할 목표 위치
     public Enemy(Scene scene, float startX, float startY) : base(scene)
@@ -47,14 +47,18 @@ class Enemy : GameObject
         if (_shootTimer >= _shootInterval)
         {
             _shootTimer = 0;                        // 총알 발사 타이머 초기화
-            Bullet = new Bullet(Scene, _posX, _posY + 1, 1); // 총알 생성 (적 바로 아래)
+            Bullet = new Bullet(Scene, _posX, _posY + 1, 0.5f ,1, "Enemy_Bullet"); // 총알 생성 (적 바로 아래)
             Scene.AddGameObject(Bullet);            // 총알을 씬에 추가
+            Bullet = new Bullet(Scene, _posX, _posY + 1, 0f, 1, "Enemy_Bullet"); // 총알 생성 (적 바로 아래)
+            Scene.AddGameObject(Bullet);
+            Bullet = new Bullet(Scene, _posX, _posY + 1, -0.5f, 1, "Enemy_Bullet"); // 총알 생성 (적 바로 아래)
+            Scene.AddGameObject(Bullet);
         }
-        
-        
+    }
 
-
-
+    public bool IsCollision(float x, float y)       // 총알과 적의 충돌 여부 확인
+    {
+        return (int)x == (int)_posX && (int)y == (int)_posY;
     }
 }
 
