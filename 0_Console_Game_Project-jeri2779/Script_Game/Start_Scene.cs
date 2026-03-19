@@ -11,10 +11,8 @@ public class Start : Scene
     public override void Draw(ScreenBuffer buffer)
     {
         // 타이틀 화면 그리기 로직
-        buffer.WriteTextCentered(6, " Player Moving Test", ConsoleColor.Yellow);
-        buffer.WriteTextCentered(10, "Arrow Keys: Move");
-        buffer.WriteTextCentered(12, "Esc: Exit");
-        buffer.WriteTextCentered(14, "Press ENTER to test" ,ConsoleColor.Green);
+        buffer.WriteTextCentered(6, " Shooting Test", ConsoleColor.Yellow);
+        buffer.WriteTextCentered(14, "ENTER" ,ConsoleColor.Green);
 
         //throw new NotImplementedException();
     }
