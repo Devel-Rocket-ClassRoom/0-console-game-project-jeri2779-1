@@ -30,8 +30,8 @@ internal class Wall : GameObject
 
     public override void Update(float deltaTime) { }
 
-    public bool IsCollision(int x, int y)     => x < Left || x > Right || y < Top || y > Bottom;
-    public bool IsCollision((float X, float Y) pos) => IsCollision((int)pos.X, (int)pos.Y);
-    public bool IsCollision(Player player)      => IsCollision(player.Pos);
+    //public bool IsCollision(int x, int y)     => x < Left || x > Right || y < Top || y > Bottom;
+    //public bool IsCollision((float X, float Y) pos) => IsCollision((int)pos.X, (int)pos.Y);
+    //public bool IsCollision(Player player)      => IsCollision(player.Pos);
 }
 //}

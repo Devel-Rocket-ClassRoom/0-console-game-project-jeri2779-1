@@ -9,14 +9,14 @@ class Enemy : GameObject
 {
     Bullet Bullet; // 총알 오브젝트 참조
 
-    //private float _posY;                     // 적의 Y 좌표  
+    //private float _posY;                    // 적의 Y 좌표  
     //private float _posX; 
 
-    private float _speed = 1f;               // 적의 이동 속도
-    private float _targetPos = 5;
+    private float _speed = 1.0f;                // 적의 이동 속도
+    private float _targetPos = 5.0f;             // 적이 이동할 목표 Y 좌표 (적이 이 위치에 도달하면 정지)
 
     private float _shootTimer;
-    private float _shootInterval = 3.0f; // 총알 발사 간격 (초)
+    private float _shootInterval = 3.0f;       // 총알 발사 간격 (초)
 
 
     // 적이 이동할 목표 위치
@@ -29,7 +29,12 @@ class Enemy : GameObject
 
     public override void Draw(ScreenBuffer buffer)
     {
-        buffer.SetCell((int)X, (int)Y, 'V', ConsoleColor.Red);
+        //적이 wall안에 있을때만 그려지게
+        if(X >= Wall.Left && X <= Wall.Right        // 적의 X 좌표가 벽의 왼쪽과 오른쪽 사이에 있는지 확인
+            && Y >= Wall.Top && Y <= Wall.Bottom)   // 적의 Y 좌표가 벽의 위쪽과 아래쪽 사이에 있는지 확인
+        {
+            buffer.SetCell((int)X, (int)Y, 'V', ConsoleColor.Red);
+        }
     }
     public override void Update(float deltaTime)
     {
@@ -61,14 +66,6 @@ class Enemy : GameObject
         }
     }
 
-    //public bool IsCollision(float x, float y)       // 총알과 적의 충돌 여부 확인
-    //{
-    //    return (int)x == (int)X && (int)y == (int)Y;
-    //}
-
-    //internal bool IsCollision(Player player)
-    //{
-    //    return (int)player.Pos.X == (int)X && player.Pos.Y == (int)Y;
-    //}
+ 
 }
 

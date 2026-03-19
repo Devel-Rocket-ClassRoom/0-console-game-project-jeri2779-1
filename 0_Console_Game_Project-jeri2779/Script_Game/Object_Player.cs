@@ -8,8 +8,10 @@ namespace Framework.Engine
 { 
     public class Player : GameObject
     {
-        private const float k_moveIntervalX = 0.15f;             // 플레이어 이 이동하는 간격 (초)
-        private const float k_moveIntervalY = 0.25f;
+        //private const float k_moveIntervalX = 0.35f;             // 플레이어 이 이동하는 간격 (초)
+        //private const float k_moveIntervalY = 0.45f;
+        private const float SpeedX = 15.0f; // 1초에 가로로 15칸 이동
+        private const float SpeedY = 10.0f;
         Bullet Bullet; // 총알 오브젝트 참조
 
         private float _moveTimerX;                                  // 이동 타이머
@@ -21,7 +23,7 @@ namespace Framework.Engine
         //private int _x;//
         //private int _y;// 플레이어의 현재 위치
         private float _shootTimer;                                  // 총알 발사 타이머
-        private const float _shootInterval = 0.8f;                  // 총알 발사 간격 (초)
+        private const float _shootInterval = 0.1f;                  // 총알 발사 간격 (초)
 
         public (int X, int Y) Pos => ((int)X, (int)Y);              // 플레이어의 현재 위치 반환
 
@@ -73,45 +75,64 @@ namespace Framework.Engine
         }
         public void Move(float deltaTime)
         {
-            if (_dirX == 0 && _dirY == 0)
-            {
-                _moveTimerX = 0;
-                _moveTimerY = 0;
-                return;
-            }
+            // 입력 방향(_dirX, _dirY) + 속도와 deltaTime을 곱해줌
+             
+            float nextX = X + (_dirX * SpeedX * deltaTime);
+            float nextY = Y + (_dirY * SpeedY * deltaTime);
 
-            float nextX = X;
-            float nextY = Y;
-
-            if (_dirX != 0)
-            {
-                _moveTimerX += deltaTime;
-                if (_moveTimerX >= k_moveIntervalX)
-                {
-                    _moveTimerX = 0;
-                    nextX = X + _dirX;
-                }
-            }
-            else _moveTimerX = 0;
-
-            if (_dirY != 0)
-            {
-                _moveTimerY += deltaTime;
-                if (_moveTimerY >= k_moveIntervalY)
-                {
-                    _moveTimerY = 0;
-                    nextY = Y + _dirY;
-                }
-            }
-            else _moveTimerY = 0;
-
-            if (nextX >= Wall.Left && nextX <= Wall.Right &&
-                nextY >= Wall.Top && nextY <= Wall.Bottom)
+            // 3. 벽 충돌 검사 (float 좌표로 정밀하게 체크)
+            // 캐릭터의 크기(Width/Height)가 있다면 여기에서 가감해줍니다.
+            if (nextX >= Wall.Left && nextX <= Wall.Right)
             {
                 X = nextX;
+            }
+
+            if (nextY >= Wall.Top && nextY <= Wall.Bottom)
+            {
                 Y = nextY;
             }
         }
+        //public void Move(float deltaTime)
+        //{
+        //    if (_dirX == 0 && _dirY == 0)
+        //    {
+        //        _moveTimerX = 0;
+        //        _moveTimerY = 0;
+        //        return;
+        //    }
+
+        //    float nextX = X;
+        //    float nextY = Y;
+
+        //    if (_dirX != 0)
+        //    {
+        //        _moveTimerX += deltaTime;
+        //        if (_moveTimerX >= k_moveIntervalX)
+        //        {
+        //            _moveTimerX = 0;
+        //            nextX = X + _dirX;
+        //        }
+        //    }
+        //    else _moveTimerX = 0;
+
+        //    if (_dirY != 0)
+        //    {
+        //        _moveTimerY += deltaTime;
+        //        if (_moveTimerY >= k_moveIntervalY)
+        //        {
+        //            _moveTimerY = 0;
+        //            nextY = Y + _dirY;
+        //        }
+        //    }
+        //    else _moveTimerY = 0;
+
+        //    if (nextX >= Wall.Left && nextX <= Wall.Right &&
+        //        nextY >= Wall.Top && nextY <= Wall.Bottom)
+        //    {
+        //        X = nextX;
+        //        Y = nextY;
+        //    }
+        //}
 
         private void HandleInput()
         {

@@ -11,7 +11,7 @@ public class Start : Scene
     public override void Draw(ScreenBuffer buffer)
     {
         // 타이틀 화면 그리기 로직
-        buffer.WriteTextCentered(6, " Shooting", ConsoleColor.Yellow);
+        buffer.WriteTextCentered(6, " Shooting Game", ConsoleColor.Yellow);
          
 
         //throw new NotImplementedException();

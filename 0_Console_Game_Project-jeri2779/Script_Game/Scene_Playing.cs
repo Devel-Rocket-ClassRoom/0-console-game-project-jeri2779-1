@@ -87,18 +87,7 @@ public class Playing : Scene
 
     public void CheckCollisions()
     {
-        // 충돌 체크 로직 (예: 플레이어와 적, 총알과 적 등)
-        // 충돌이 발생하면 생명 감소, 점수 증가, 게임 오버 처리 등
-        // 예시:
-        // if (player.IsCollision(enemy))
-        // {
-        //     life--;
-        //     if (life <= 0)
-        //     {
-        //         isGameOver = true;
-        //         OnGameOver?.Invoke();
-        //     }
-        // }
+       
         var bullets = FindGameObjectsAll("Player_Bullet");
         var enemies = FindGameObjectsAll("Enemy");
         var enemyBullets = FindGameObjectsAll("Enemy_Bullet");
@@ -122,7 +111,7 @@ public class Playing : Scene
         {
             if(player != null && player.IsActive)
             {
-                if(Math.Abs(bullet.X - player.Pos.X) <= 1f && Math.Abs(bullet.Y - player.Pos.Y) <= 1f)
+                if(Math.Abs(bullet.X - player.X) <= 1f && Math.Abs(bullet.Y - player.Y) <= 1f)
                 {
                     RemoveGameObject(bullet);
                     life--;
