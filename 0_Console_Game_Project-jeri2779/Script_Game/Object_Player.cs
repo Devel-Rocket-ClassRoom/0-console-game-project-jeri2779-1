@@ -18,7 +18,7 @@ namespace Framework.Engine
         private int _x;//
         private int _y;// 플레이어의 현재 위치
         private float _shootTimer;                                  // 총알 발사 타이머
-        private const float _shootInterval = 0.2f;                  // 총알 발사 간격 (초)
+        private const float _shootInterval = 0.5f;                  // 총알 발사 간격 (초)
 
         public (int X, int Y) Pos => (_x, _y);// 플레이어의 현재 위치 반환
         //현재 플레이어의 위치 정보 표시 필드가 유사한게 2개 있음
@@ -55,7 +55,6 @@ namespace Framework.Engine
                 Bullet = new Bullet(Scene, _x, _y - 1 , 0,  -1, "Player_Bullet"); // 총알 생성 (플레이어 바로 위)
                 Scene.AddGameObject(Bullet);            // 총알을 씬에 추가
             }
-
             //throw new NotImplementedException();
         }
         public void Move(float deltaTime)
@@ -72,7 +71,7 @@ namespace Framework.Engine
 
             _moveTimer = k_moveInterval;                 // 이동 타이머 초기화
 
-            int nextX = _x + _dirX;                    // 다음 위치 계산
+            int nextX = _x + _dirX;                      // 다음 위치 계산
             int nextY = _y + _dirY;
 
             if (nextX >= Wall.Left && nextX <= Wall.Right &&

@@ -16,7 +16,7 @@ class Enemy : GameObject
     private float _targetPos = 5;
 
     private float _shootTimer;
-    private float _shootInterval = 0.4f; // 총알 발사 간격 (초)
+    private float _shootInterval = 1.5f; // 총알 발사 간격 (초)
 
     // 적이 이동할 목표 위치
     public Enemy(Scene scene, float startX, float startY) : base(scene)
@@ -53,12 +53,21 @@ class Enemy : GameObject
             Scene.AddGameObject(Bullet);
             Bullet = new Bullet(Scene, _posX, _posY + 1, -0.5f, 1, "Enemy_Bullet"); // 총알 생성 (적 바로 아래)
             Scene.AddGameObject(Bullet);
+            Bullet = new Bullet(Scene, _posX, _posY + 1, -1f, 1, "Enemy_Bullet"); // 총알 생성 (적 바로 아래)
+            Scene.AddGameObject(Bullet);
+            Bullet = new Bullet(Scene, _posX, _posY + 1, 1f, 1, "Enemy_Bullet"); // 총알 생성 (적 바로 아래)
+            Scene.AddGameObject(Bullet);
         }
     }
 
     public bool IsCollision(float x, float y)       // 총알과 적의 충돌 여부 확인
     {
         return (int)x == (int)_posX && (int)y == (int)_posY;
+    }
+
+    internal bool IsCollision(Player player)
+    {
+        return (int)player.Pos.X == (int)_posX && player.Pos.Y == (int)_posY;
     }
 }
 

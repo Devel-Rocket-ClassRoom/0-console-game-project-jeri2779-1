@@ -8,9 +8,9 @@ using Framework.Engine;
 internal class Wall : GameObject
 {
     public static int Left   { get; private set; } = 1; 
-    public static int Right  { get; private set; } = 48;   
+    public static int Right  { get; private set; } = 38;   
     public static int Top    { get; private set; } = 3;  
-    public static int Bottom { get; private set; } = 38;    
+    public static int Bottom { get; private set; } = 17;    
 
    
 

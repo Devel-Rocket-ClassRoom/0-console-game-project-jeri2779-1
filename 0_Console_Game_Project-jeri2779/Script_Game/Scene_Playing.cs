@@ -61,6 +61,9 @@ public class Playing : Scene
     }
     public override void Update(float deltaTime)
     {
+        base.UpdateGameObjects(deltaTime);
+
+
         if (isGameOver)
         {
             if (Input.IsKeyDown(ConsoleKey.Enter)) 
@@ -75,24 +78,24 @@ public class Playing : Scene
 
         if (wall.IsCollision(player))   // 벽과 충돌여부 확인
         {
-            isGameOver = true;
-            return;
+            //isGameOver = true;
+            //return;
 
         }
-
-        var playerBullet = FindGameObject("Player_Bullet") as Bullet;
-        if (playerBullet != null && enemy.IsCollision(playerBullet.X, playerBullet.Y)) // 총알과 충돌여부 확인
+        foreach (var enemy in enemies)
         {
-            RemoveGameObject(enemy);
-            RemoveGameObject(playerBullet);
-            life--;
-            if (life <= 0)
+            if (enemy.IsCollision(player))  // 적과 충돌여부 확인
             {
-                isGameOver = true;
-                OnGameOver?.Invoke();
+                life--;
+                if (life <= 0)
+                {
+                    isGameOver = true;
+                    OnGameOver?.Invoke();
+                }
+                return;
             }
         }
-     
+
     }
 }
 

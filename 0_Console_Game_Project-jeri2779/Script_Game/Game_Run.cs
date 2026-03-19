@@ -8,9 +8,9 @@ public class Run_Game : GameApp //1. GameApp을 상속받아 SnakeGame 클래스
 {
     private readonly SceneManager<Scene> _scenes = new SceneManager<Scene>(); // 씬 매니저 (게임 씬 관리)
 
-    public Run_Game() : base(40, 20)//2. 기본 생성자에서 GameApp의 생성자 호출하여 게임 화면 크기 설정
-    {
-    }
+    //public Run_Game() : base(40, 20)//2. 기본 생성자에서 GameApp의 생성자 호출하여 게임 화면 크기 설정
+    //{
+    //}
     public Run_Game(int width, int height) : base(width, height)
     {
     }
