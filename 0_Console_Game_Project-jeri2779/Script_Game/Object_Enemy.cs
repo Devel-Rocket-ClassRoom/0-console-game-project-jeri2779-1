@@ -31,6 +31,14 @@ class Enemy : GameObject
         Y = startY;                     // 적의 초기 위치 설정
         _shootPattern = shootPattern; // 총알 발사 패턴 설정
     }
+    public Enemy(Scene scene, float startX, float startY,
+                Action<Scene, float, float, float, float> aimPattern) : base(scene)//유도 패턴 생성자 확장
+    {
+        Name = "Enemy";
+        X = startX;
+        Y = startY;                     // 적의 초기 위치 설정
+        _aimPattern = aimPattern;       // 유도 패턴 설정 (확장)
+    }
 
     public override void Draw(ScreenBuffer buffer)
     {
@@ -44,23 +52,33 @@ class Enemy : GameObject
     public override void Update(float deltaTime)
     {
         //적이 위에서 내려오면서 일정시간 후 정지
-        if(Y < _targetPos)                      // 적이 화면 상단에서 내려오는 상태
+        if(Y < _targetPos)                              // 적이 화면 상단에서 내려오는 상태
         {
             Y += _speed * deltaTime;     
         }
         else
         {
-                                                    // 적이 일정 위치에 도달하면 정지
+                                                        // 적이 일정 위치에 도달하면 정지
             Y = _targetPos;  
         }
-        
 
-        _shootTimer += deltaTime;                   // 총알 발사 타이머 업데이트
-        if (_shootTimer >= _shootInterval)
+
+        _shootTimer += deltaTime;                       // 총알 발사 타이머 업데이트
+        if (_shootTimer >= _shootInterval)              // 총알 발사 간격이 지났는지 확인
         {
-            _shootTimer = 0;                        // 총알 발사 타이머 초기화
-            _shootPattern(Scene, X, Y);             // 설정된 총알 발사 패턴 실행
+            _shootTimer = 0;
 
+            if (_shootPattern != null)
+            {
+                _shootPattern.Invoke(Scene, X, Y);      // 총알 발사 패턴 실행
+            }
+            else if (_aimPattern != null)
+            {
+                var player = Scene.FindGameObject("Player"); // 플레이어 오브젝트 참조 (유도 패턴용)
+                float px = player != null ? player.X : X;    // 플레이어의 X 좌표, 플레이어가 없으면 적의 X 좌표 사용
+                float py = player != null ? player.Y : Y;
+                _aimPattern.Invoke(Scene, X, Y, px, py);     //  유도 패턴 실행 (적의 위치와 플레이어의 위치 전달)
+            }
         }
     }
 
