@@ -9,6 +9,9 @@ namespace Framework.Engine
         private readonly List<GameObject> _pendingRemove = new List<GameObject>();
         private bool _isUpdating;
 
+
+        public IReadOnlyList<GameObject> GameObjects => _gameObjects; // 게임 오브젝트 리스트에 대한 읽기 전용 접근자
+
         public abstract void Load();                    // 씬이 활성화될 때 호출
         public abstract void Update(float deltaTime);   // 씬이 매 프레임 업데이트될 때 호출
         public abstract void Draw(ScreenBuffer buffer); // 씬이 매 프레임 그려질 때 호출
