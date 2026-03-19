@@ -32,10 +32,10 @@ namespace Framework.Engine
         {
             _width = width;
             _height = height;
-            _chars = new char[height, width];
-            _fgColors = new ConsoleColor[height, width];
-            _bgColors = new ConsoleColor[height, width];
-            _frameBuilder = new StringBuilder(width * height * 4);
+            _chars = new char[height, width];//
+            _fgColors = new ConsoleColor[height, width];// 버퍼 초기화
+            _bgColors = new ConsoleColor[height, width];// 버퍼 초기화
+            _frameBuilder = new StringBuilder(width * height * 4);             // 초기 프레임 빌더 용량 설정
             Clear();
             EnableVirtualTerminalProcessing();
         }

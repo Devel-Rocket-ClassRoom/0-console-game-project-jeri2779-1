@@ -37,7 +37,7 @@ internal class Bullet : GameObject
         _x += (_speed * _dirX) * deltaTime;                                  // 총알이 X 방향으로 이동
         _y += (_speed * _dirY) * deltaTime;                                  // 총알이 Y 방향으로 이동
        
-        if(_y < 0 || _y > Wall.Bottom + 2 || _x < 0 || _x > Wall.Right + 2)
+        if(_y < 0 || _y > Wall.Bottom + 2 || _x < 0 || _x > Wall.Right + 2)     // 총알이 화면 밖으로 나가면 제거
         {
             Scene.RemoveGameObject(this);                                         // 총알 제거
             return;

@@ -61,7 +61,7 @@ public class Playing : Scene
     }
     public override void Update(float deltaTime)
     {
-        base.UpdateGameObjects(deltaTime);
+         
 
 
         if (isGameOver)

@@ -8,10 +8,13 @@ namespace Framework.Engine
 { 
     public class Player : GameObject
     {
-        private const float k_moveInterval = 0.15f;             // 뱀이 이동하는 간격 (초)
+        private const float k_moveIntervalX = 0.15f;             // 플레이어 이 이동하는 간격 (초)
+        private const float k_moveIntervalY = 0.25f;
         Bullet Bullet; // 총알 오브젝트 참조
 
-        private float _moveTimer;                                  // 이동 타이머
+        private float _moveTimerX;                                  // 이동 타이머
+        private float _moveTimerY;
+
         private int _dirX;                                           // 이동 방향 X (-1, 0, 1)
         private int _dirY;                                           // 이동 방향 Y (-1, 0, 1)
 
@@ -71,20 +74,37 @@ namespace Framework.Engine
         }
         public void Move(float deltaTime)
         {
-            //키입력시 플레이어의 위치를 업데이트
-            if(_dirX == 0 && _dirY == 0) 
+            if (_dirX == 0 && _dirY == 0)
             {
-                _moveTimer = 0;                          // 이동 방향이 없으면 이동 타이머 초기화
-                return;                                  // 이동 방향이 없으면 이동하지 않음
+                _moveTimerX = 0;
+                _moveTimerY = 0;
+                return;
             }
-            _moveTimer += deltaTime;                     // 이동 타이머 업데이트
 
-            if(_moveTimer < k_moveInterval) return;      // 이동 간격이 되지 않았으면 이동하지 않음
+            int nextX = _x;
+            int nextY = _y;
 
-            _moveTimer = k_moveInterval;                 // 이동 타이머 초기화
+            if (_dirX != 0)
+            {
+                _moveTimerX += deltaTime;
+                if (_moveTimerX >= k_moveIntervalX)
+                {
+                    _moveTimerX = 0;
+                    nextX = _x + _dirX;
+                }
+            }
+            else _moveTimerX = 0;
 
-            int nextX = _x + _dirX;                      // 다음 위치 계산
-            int nextY = _y + _dirY;
+            if (_dirY != 0)
+            {
+                _moveTimerY += deltaTime;
+                if (_moveTimerY >= k_moveIntervalY)
+                {
+                    _moveTimerY = 0;
+                    nextY = _y + _dirY;
+                }
+            }
+            else _moveTimerY = 0;
 
             if (nextX >= Wall.Left && nextX <= Wall.Right &&
                 nextY >= Wall.Top && nextY <= Wall.Bottom)
