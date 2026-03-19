@@ -7,7 +7,7 @@ using System.Text;
 class Enemy : GameObject
 
 {
-    Bullet Bullet; // 총알 오브젝트 참조\
+    //Bullet Bullet; // 총알 오브젝트 참조\
 
     private Action<Scene, float, float> _shootPattern;                        
     private Action<Scene, float, float, float, float> _aimPattern; // 적의 총알 발사 패턴을 정의 델리게이트 (확장) 유도 패턴용
