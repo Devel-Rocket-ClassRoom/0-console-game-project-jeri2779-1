@@ -22,6 +22,22 @@ public class Playing : Scene
     public event GameAction OnPlayAgain;  // 다시 시작 이벤트
     public event GameAction OnGameOver;   // 게임 오버 이벤트
 
+    private int _state = 1;
+    private const int MaxState = 5;
+    private StagePhase _phase = StagePhase.Waiting;
+    private float _resultTimer = 0f;
+    private const float _resultDuration = 3f; // 결과 화면 지속 시간 (초)
+    private int _stageScore = 0; // 스테이지 점수
+
+    private enum StagePhase
+    {
+        Waiting,
+        WaveSpawn,
+        BossSpawn,
+        BossFight,
+        StageClear,
+    }
+
     public Playing(int width, int height)
     {
         // 생성자에서 필요한 초기화 작업 수행
@@ -95,21 +111,21 @@ public class Playing : Scene
 
     public void CheckCollisions()
     {
-       
+
         var bullets = FindGameObjectsAll("Player_Bullet");
         var enemies = FindGameObjectsAll("Enemy");
         var enemyBullets = FindGameObjectsAll("Enemy_Bullet");
-         
+
         //플레이어  총알과 적 충돌 체크
         foreach (var bullet in bullets)
         {
-            foreach(var enemy in enemies)
+            foreach (var enemy in enemies)
             {
-                if(Math.Abs(bullet.X - enemy.X) <= 1f               // 총알과 적의 충돌 범위 체크
+                if (Math.Abs(bullet.X - enemy.X) <= 1f               // 총알과 적의 충돌 범위 체크
                 && Math.Abs(bullet.Y - enemy.Y) <= 1f)              // 충돌이 발생한 경우 총알과 적 제거, 점수 증가
 
                 {
-                                              
+
                     RemoveGameObject(bullet);
                     //체력 시스템을 구현할시 remove를 다른곳에서 하고 대신 대미지 관련 로직을 넣을수도 있음
                     RemoveGameObject(enemy);
@@ -121,9 +137,9 @@ public class Playing : Scene
         // 적 총알과 플레이어 충돌 체크
         foreach (var bullet in enemyBullets)
         {
-            if(player != null && player.IsActive)
+            if (player != null && player.IsActive)
             {
-                if(Math.Abs(bullet.X - player.X) <= 1f &&           // 총알과 플레이어의 충돌 범위 체크
+                if (Math.Abs(bullet.X - player.X) <= 1f &&           // 총알과 플레이어의 충돌 범위 체크
                    Math.Abs(bullet.Y - player.Y) <= 1f)             // 충돌이 발생한 경우 총알 제거, 생명 감소
                 {
                     RemoveGameObject(bullet);
@@ -133,6 +149,23 @@ public class Playing : Scene
             }
 
         }
+
+        //var allObjects = _gameObjects;  
+
+        //foreach (var obj in allObjects)
+        //{
+        //    if (obj is Bullet bullet && bullet.IsActive)
+        //    {
+        //        if (bullet.Name == "Player_Bullet")
+        //        {
+        //            // 적들과의 충돌 체크 로직 수행
+        //        }
+        //        else if (bullet.Name == "Enemy_Bullet")
+        //        {
+        //            // 플레이어와의 충돌 체크 로직 수행
+        //        }
+        //    }
+        //}
 
 
     }    
