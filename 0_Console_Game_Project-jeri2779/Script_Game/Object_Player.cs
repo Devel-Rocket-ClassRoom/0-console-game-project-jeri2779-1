@@ -10,9 +10,9 @@ namespace Framework.Engine
     {
         //private const float k_moveIntervalX = 0.35f;             // 플레이어 이 이동하는 간격 (초)
         //private const float k_moveIntervalY = 0.45f;
-        private const float SpeedX = 15.0f; // 1초에 가로로 15칸 이동
+        private const float SpeedX = 15.0f; // 1 초에 가로로 15칸 이동
         private const float SpeedY = 10.0f;
-        Bullet Bullet; // 총알 오브젝트 참조
+        
 
         private float _moveTimerX;                                  // 이동 타이머
         private float _moveTimerY;
@@ -25,12 +25,11 @@ namespace Framework.Engine
         private float _shootTimer;                                  // 총알 발사 타이머
         private const float _shootInterval = 0.1f;                  // 총알 발사 간격 (초)
 
-        public (int X, int Y) Pos => ((int)X, (int)Y);              // 플레이어의 현재 위치 반환
+        //public (int X, int Y) Pos => ((int)X, (int)Y);              // 플레이어의 현재 위치 반환
 
        
 
-        //현재 플레이어의 위치 정보 표시 필드가 유사한게 2개 있음
-        //하나로 통합하는걸 고려.
+         
 
 
 
@@ -45,6 +44,7 @@ namespace Framework.Engine
         public override void Draw(ScreenBuffer buffer)
         {
             buffer.SetCell((int)X, (int)Y, '@', ConsoleColor.Green);
+            buffer.SetCell((int)X, (int)Y + 1, '@', ConsoleColor.Green);
 
 
             //throw new NotImplementedException();
@@ -65,12 +65,13 @@ namespace Framework.Engine
          //추가 메서드 목록======================================================================================
         public void Shoot(float deltaTime)
         {
+            Bullet bullet;
             _shootTimer += deltaTime;                   // 총알 발사 타이머 업데이트
             if (_shootTimer >= _shootInterval)
             {
                 _shootTimer = 0;                        // 총알 발사 타이머 초기화
-                Bullet = new Bullet(Scene, X, Y - 1, 0, -1, "Player_Bullet"); // 총알 생성 (플레이어 바로 위)
-                Scene.AddGameObject(Bullet);            // 총알을 씬에 추가
+                bullet = new Bullet(Scene, X, Y - 1, 0, -1, SpeedY + 1, "Player_Bullet"); // 총알 생성 (플레이어 바로 위)
+                Scene.AddGameObject(bullet);            // 총알을 씬에 추가
             }
         }
         public void Move(float deltaTime)
@@ -92,47 +93,7 @@ namespace Framework.Engine
                 Y = nextY;
             }
         }
-        //public void Move(float deltaTime)
-        //{
-        //    if (_dirX == 0 && _dirY == 0)
-        //    {
-        //        _moveTimerX = 0;
-        //        _moveTimerY = 0;
-        //        return;
-        //    }
-
-        //    float nextX = X;
-        //    float nextY = Y;
-
-        //    if (_dirX != 0)
-        //    {
-        //        _moveTimerX += deltaTime;
-        //        if (_moveTimerX >= k_moveIntervalX)
-        //        {
-        //            _moveTimerX = 0;
-        //            nextX = X + _dirX;
-        //        }
-        //    }
-        //    else _moveTimerX = 0;
-
-        //    if (_dirY != 0)
-        //    {
-        //        _moveTimerY += deltaTime;
-        //        if (_moveTimerY >= k_moveIntervalY)
-        //        {
-        //            _moveTimerY = 0;
-        //            nextY = Y + _dirY;
-        //        }
-        //    }
-        //    else _moveTimerY = 0;
-
-        //    if (nextX >= Wall.Left && nextX <= Wall.Right &&
-        //        nextY >= Wall.Top && nextY <= Wall.Bottom)
-        //    {
-        //        X = nextX;
-        //        Y = nextY;
-        //    }
-        //}
+         
 
         private void HandleInput()
         {

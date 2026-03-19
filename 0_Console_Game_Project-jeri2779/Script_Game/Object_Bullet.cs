@@ -8,14 +8,15 @@ internal class Bullet : GameObject
 {
      
 
-    private float _speed = 4f;                                        // 총알 속도
+    private float _speed = 15f;                                        // 총알 속도
 
     private float _dirX, _dirY;                                       // 총알 이동 방향 벡터
 
    
 
 
-    public Bullet(Scene scene, float x, float y, float dirX, float dirY, string name) : base(scene)
+    public Bullet(Scene scene, float x, float y, 
+                    float dirX, float dirY, float speed, string name) : base(scene)
     {
          
         Name = name;
@@ -23,7 +24,7 @@ internal class Bullet : GameObject
         Y = y;                                                          // 총알의 초기 Y 좌표  
         _dirX = dirX;                                                   // 총알의 이동 방향 벡터 X 
         _dirY = dirY;                                                   // 총알의 이동 방향 벡터 Y  
-       
+        _speed = speed;                                               // 총알의 속도 설정
     }
 
 

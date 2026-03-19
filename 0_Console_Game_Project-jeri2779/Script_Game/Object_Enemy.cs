@@ -7,12 +7,15 @@ using System.Text;
 class Enemy : GameObject
 
 {
-    Bullet Bullet; // 총알 오브젝트 참조
+    Bullet Bullet; // 총알 오브젝트 참조\
+
+    private Action<Scene, float, float> _shootPattern;                        
+    private Action<Scene, float, float, float, float> _aimPattern; // 적의 총알 발사 패턴을 정의 델리게이트 (확장) 유도 패턴용
 
     //private float _posY;                    // 적의 Y 좌표  
     //private float _posX; 
 
-    private float _speed = 1.0f;                // 적의 이동 속도
+    private float _speed = 8.0f;                // 적의 이동 속도
     private float _targetPos = 5.0f;             // 적이 이동할 목표 Y 좌표 (적이 이 위치에 도달하면 정지)
 
     private float _shootTimer;
@@ -20,11 +23,13 @@ class Enemy : GameObject
 
 
     // 적이 이동할 목표 위치
-    public Enemy(Scene scene, float startX, float startY) : base(scene)
+    public Enemy(Scene scene, float startX, float startY, 
+                Action<Scene, float, float> shootPattern) : base(scene)
     {
         Name = "Enemy";
         X = startX;
-        Y = startY;
+        Y = startY;                     // 적의 초기 위치 설정
+        _shootPattern = shootPattern; // 총알 발사 패턴 설정
     }
 
     public override void Draw(ScreenBuffer buffer)
@@ -48,21 +53,14 @@ class Enemy : GameObject
                                                     // 적이 일정 위치에 도달하면 정지
             Y = _targetPos;  
         }
+        
 
         _shootTimer += deltaTime;                   // 총알 발사 타이머 업데이트
         if (_shootTimer >= _shootInterval)
         {
             _shootTimer = 0;                        // 총알 발사 타이머 초기화
-            Bullet = new Bullet(Scene, X, Y + 1, 0.5f ,1, "Enemy_Bullet"); // 총알 생성 (적 바로 아래)
-            Scene.AddGameObject(Bullet);            // 총알을 씬에 추가
-            Bullet = new Bullet(Scene, X, Y + 1, 0f, 1, "Enemy_Bullet"); // 총알 생성 (적 바로 아래)
-            Scene.AddGameObject(Bullet);
-            Bullet = new Bullet(Scene, X, Y + 1, -0.5f, 1, "Enemy_Bullet"); // 총알 생성 (적 바로 아래)
-            Scene.AddGameObject(Bullet);
-            Bullet = new Bullet(Scene, X, Y + 1, -1f, 1, "Enemy_Bullet"); // 총알 생성 (적 바로 아래)
-            Scene.AddGameObject(Bullet);
-            Bullet = new Bullet(Scene, X, Y + 1, 1f, 1, "Enemy_Bullet"); // 총알 생성 (적 바로 아래)
-            Scene.AddGameObject(Bullet);
+            _shootPattern(Scene, X, Y);             // 설정된 총알 발사 패턴 실행
+
         }
     }
 

@@ -31,8 +31,13 @@ public class Playing : Scene
 
     public override void Draw(ScreenBuffer buffer)
     {
+        //wall.Draw(buffer); // 벽 그리기
         // 게임 씬 그리기 로직 
         DrawGameObjects(buffer);
+        player.Draw(buffer); // 플레이어 그리기(항상 마지막)
+
+        //player.Draw(buffer); // 플레이어 그리기
+        //플레이어는 반드시 마지막에 그리도록 해야함(총알이 플레이어 덮는것 방지)
         buffer.WriteText(1, 0, $"life: {life}", ConsoleColor.Cyan); // 생명 표시
         buffer.WriteText(10, 1, $"score: {score}", ConsoleColor.Green); // 점수 표시
 
@@ -46,16 +51,19 @@ public class Playing : Scene
     }
     public override void Load() //Awake()
     {
-        wall = new Wall(this, boundWidth, boundHeight);
         life = 3;
         isGameOver = false;
+
+
+        wall = new Wall(this, boundWidth, boundHeight);
         AddGameObject(wall);
-        player = new Player(this, boundWidth / 2, boundHeight - 2);
+        enemy = new Enemy(this, 10, 0, BPatterns.Circle8);
+        AddGameObject(enemy);
+        enemy = new Enemy(this, 30, 0, BPatterns.Spread5);
+        AddGameObject(enemy);
+
+        player = new Player(this, boundWidth / 2, boundHeight - 3);
         AddGameObject(player);
-        enemy = new Enemy(this, 10, 0);
-        AddGameObject(enemy);
-        enemy = new Enemy(this, 30, 0);
-        AddGameObject(enemy);
 
 
         //throw new NotImplementedException();
@@ -91,27 +99,32 @@ public class Playing : Scene
         var bullets = FindGameObjectsAll("Player_Bullet");
         var enemies = FindGameObjectsAll("Enemy");
         var enemyBullets = FindGameObjectsAll("Enemy_Bullet");
-        // 적 총알과 플레이어 충돌 체크
-
+         
+        //플레이어  총알과 적 충돌 체크
         foreach (var bullet in bullets)
         {
             foreach(var enemy in enemies)
             {
-                if(Math.Abs(bullet.X - enemy.X) <= 1f && Math.Abs(bullet.Y - enemy.Y) <= 1f)
+                if(Math.Abs(bullet.X - enemy.X) <= 1f               // 총알과 적의 충돌 범위 체크
+                && Math.Abs(bullet.Y - enemy.Y) <= 1f)              // 충돌이 발생한 경우 총알과 적 제거, 점수 증가
+
                 {
+                                              
                     RemoveGameObject(bullet);
+                    //체력 시스템을 구현할시 remove를 다른곳에서 하고 대신 대미지 관련 로직을 넣을수도 있음
                     RemoveGameObject(enemy);
                     score += 10;
                     break;
                 }
             }
         }
-
-        foreach(var bullet in enemyBullets)
+        // 적 총알과 플레이어 충돌 체크
+        foreach (var bullet in enemyBullets)
         {
             if(player != null && player.IsActive)
             {
-                if(Math.Abs(bullet.X - player.X) <= 1f && Math.Abs(bullet.Y - player.Y) <= 1f)
+                if(Math.Abs(bullet.X - player.X) <= 1f &&           // 총알과 플레이어의 충돌 범위 체크
+                   Math.Abs(bullet.Y - player.Y) <= 1f)             // 충돌이 발생한 경우 총알 제거, 생명 감소
                 {
                     RemoveGameObject(bullet);
                     life--;
