@@ -71,13 +71,13 @@ public class Playing : Scene
         {
             buffer.WriteTextCentered(8, "Game Over", ConsoleColor.Red);
             buffer.WriteTextCentered(10, $"Score: {_stageScore}", ConsoleColor.Yellow);
-            buffer.WriteTextCentered(12, "Press ENTER to Retry", ConsoleColor.White);
+            buffer.WriteTextCentered(12, "ENTER to Retry", ConsoleColor.White);
         }
         if (_isAllClear)//모든 스테이지 클리어 상태 화면
         {
             buffer.WriteTextCentered(8, "All Stages Clear!", ConsoleColor.Yellow);
             buffer.WriteTextCentered(10, $"Score: {_stageScore}", ConsoleColor.Green);
-            buffer.WriteTextCentered(12, "ENTER to Play", ConsoleColor.White);
+            buffer.WriteTextCentered(12, "ENTER to Re-Play", ConsoleColor.White);
         }
 
         if (_isStageClear)
@@ -88,6 +88,7 @@ public class Playing : Scene
         }
         //throw new NotImplementedException();
     }
+   
     public override void Load() //Awake()
     {
          
@@ -101,6 +102,7 @@ public class Playing : Scene
 
         _player = new Player(this, _boundWidth / 2, _boundHeight - 3);
         AddGameObject(_player);
+
         _stageManager = new StageManager(this, _gameData);
         _stageManager.OnStageClear += () => { _isStageClear = true; _stageTimer = 0; };   // 스테이지 클리어 이벤트 구독
         _stageManager.OnAllStageClear += () => { _isAllClear = true;};  // 스테이지 올클리어 이벤트 구독
@@ -116,6 +118,27 @@ public class Playing : Scene
     }
     public override void Update(float deltaTime)
     {
+        GameOver(); // 게임 오버 상태 
+       
+        AllClear();// 모든 스테이지 클리어 상태
+
+        if (_isStageClear)// 스테이지 클리어 상태
+        {
+            _stageTimer += deltaTime;
+            if (_stageTimer >= _stageWaitTime)
+            {
+                _isStageClear = false;
+            }
+            return;
+        }
+        UpdateGameObjects(deltaTime);    
+        CheckCollisions();              // 충돌 체크 호출
+        _stageManager.Update(deltaTime); // 스테이지 매니저 업데이트 호출
+
+    }
+    //추가 메서드 =======================================================================================
+    public void GameOver()
+    {
         if (_isGameOver)
         {
             if (Input.IsKeyDown(ConsoleKey.Enter))
@@ -125,26 +148,18 @@ public class Playing : Scene
             }
             return;
         }
-        UpdateGameObjects(deltaTime);    
-        CheckCollisions();              // 충돌 체크 호출
-        _stageManager.Update(deltaTime); // 스테이지 매니저 업데이트 호출
-
-        if(_isAllClear)
+    }
+     
+    
+    public void AllClear()
+    {
+        if (_isAllClear)
         {
+            _player.IsActive = false; // 플레이어 비활성화
             if (Input.IsKeyDown(ConsoleKey.Enter))
             {
                 _isGameOver = false;
                 OnPlayAgain?.Invoke();
-            }
-            return ;
-        }
-
-        if(_isStageClear)
-        {
-            _stageTimer += deltaTime;
-            if (_stageTimer >= _stageWaitTime)
-            {
-               _isStageClear = false;
             }
             return;
         }
