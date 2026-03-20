@@ -48,6 +48,14 @@ public class Run_Game : GameApp //1. GameApp을 상속받아 SnakeGame 클래스
     }
     public void ChangedToPlay()
     {
+        // ★ 버그 원인: _gameData는 Run_Game에 딱 한 번만 생성되는 공유 참조이다.       
+        // 게임 오버 후 Life가 0이 된 상태에서 다시 플레이하면 _gameData가 리셋되지 않아
+        // 새 게임도 Life = 0으로 시작하게 된다.
+        // → 새 게임이 시작될 때마다 반드시 여기서 초기값으로 되돌려야 한다.
+        _gameData.Life = 3;
+        _gameData.Stage = 1;
+        _gameData.Score = 0;    
+
         var play = new Playing(Buffer.Width, Buffer.Height, _gameData);                 // 플레이 씬 생성
         play.OnPlayAgain += ChangedToTitle;         // 플레이 씬에서 게임 오버 이벤트 구독
         _scenes.ChangeScene(play);                  // 플레이 씬으로 변경

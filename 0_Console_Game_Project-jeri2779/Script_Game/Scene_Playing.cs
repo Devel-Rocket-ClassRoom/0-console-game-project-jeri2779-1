@@ -15,22 +15,21 @@ public class Playing : Scene
     private int boundHeight;               // 게임 화면 높이
 
 
-    //private int life;                     // 생명 변수
-    //private int score;                    // 점수 변수
+    
     private bool isGameOver;              // 게임 오버 상태 변수
 
     public event GameAction OnPlayAgain;  // 다시 시작 이벤트
     public event GameAction OnGameOver;   // 게임 오버 이벤트
 
    
-    private float _phaseTimer = 0f;          // 대기 시간용 타이머
+  
 
     private readonly GameData _gameData;         // 게임 데이터 참조
     private StageManager _stageManager;              // 스테이지 매니저 참조
 
     //private int _life;                     // 생명 변수
     private int _stageScore;
-    private bool _isGameOver;
+    //private bool _isGameOver;
 
 
 
@@ -59,6 +58,7 @@ public class Playing : Scene
         //플레이어는 반드시 마지막에 그리도록 해야함(총알이 플레이어 덮는것 방지)
         buffer.WriteText(1, 0, $"Life: {_gameData.Life}", ConsoleColor.Cyan);
         buffer.WriteText(1, 1, $"Score: {_stageScore}", ConsoleColor.Green);
+        buffer.WriteText(15,1, $"Stage: {_gameData.Stage}", ConsoleColor.Magenta);
 
         if (isGameOver)
         {
@@ -77,10 +77,7 @@ public class Playing : Scene
 
         wall = new Wall(this, boundWidth, boundHeight);
         AddGameObject(wall);
-        //enemy = new Enemy(this, 10, 0, BPatterns.Circle8);
-        //AddGameObject(enemy);
-        //enemy = new Enemy(this, 30, 0, BPatterns.Spread5);
-        //AddGameObject(enemy);
+         
 
         player = new Player(this, boundWidth / 2, boundHeight - 3);
         AddGameObject(player);
@@ -107,7 +104,7 @@ public class Playing : Scene
             }
             return;
         }
-        UpdateGameObjects(deltaTime);   // ← 주석 해제: 플레이어 Update/HandleInput 호출됨
+        UpdateGameObjects(deltaTime);    
         CheckCollisions();              // 충돌 체크 호출
         _stageManager.Update(deltaTime); // 스테이지 매니저 업데이트 호출
 
@@ -134,9 +131,9 @@ public class Playing : Scene
 
                     RemoveGameObject(bullet);
                     //체력 시스템을 구현할시 remove를 다른곳에서 하고 대신 대미지 관련 로직을 넣을수도 있음
-                    RemoveGameObject(enemy);  
+                    RemoveGameObject(enemy);
                     _stageScore += 10;
-                    break;                  // 한 총알이 여러 적과 충돌하는 것을 방지하기 위해 내부 루프 탈출
+                    break;                              // 한 총알이 여러 적과 충돌하는 것을 방지하기 위해 내부 루프 탈출
                 }
             }
         }
@@ -162,22 +159,7 @@ public class Playing : Scene
 
         }
 
-        //var allObjects = _gameObjects;  
 
-        //foreach (var obj in allObjects)
-        //{
-        //    if (obj is Bullet bullet && bullet.IsActive)
-        //    {
-        //        if (bullet.Name == "Player_Bullet")
-        //        {
-        //            // 적들과의 충돌 체크 로직 수행
-        //        }
-        //        else if (bullet.Name == "Enemy_Bullet")
-        //        {
-        //            // 플레이어와의 충돌 체크 로직 수행
-        //        }
-        //    }
-        //}
 
 
     }    

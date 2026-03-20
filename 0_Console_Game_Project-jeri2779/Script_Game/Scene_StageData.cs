@@ -19,13 +19,13 @@ internal class StageData
         public float WaitTime { get; set; }               // 스테이지 시작 전 대기 시간
     }
 
-    public static StageInfo[] All { get; } = new StageInfo[]
+    public static StageInfo[] All { get; } = new StageInfo[] // 모든 스테이지 정보
     {
         Stage1(),
         Stage2(),
     };
 
-    private static StageInfo Stage1() => new StageInfo //밑의 StageInfo 정보 생성
+    private static StageInfo Stage1() => new StageInfo      //밑의 StageInfo 정보 생성
     {
         WaitTime = 2f,
         Waves = new WaveData[]
@@ -57,7 +57,7 @@ internal class StageData
         {
             EnemyCount = 1,
             WaveTime = 60f,
-            Patterns = new Action<Scene, float, float>[] { BPatterns.Circle8 }
+            Patterns = new Action<Scene, float, float>[] { BPatterns.Circle8,BPatterns.Spread5, BPatterns.Spread3 }
         },
     };
 

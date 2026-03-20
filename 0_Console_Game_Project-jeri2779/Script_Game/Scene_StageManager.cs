@@ -88,7 +88,9 @@ internal class StageManager
     }
     private void UpdateStageClear(float deltaTime)
     {
+        if(_gameData.Stage >= StageData.All.Length) return; // 마지막 스테이지면 종료
         _gameData.Stage++;          // 다음 스테이지로 이동
+        _phase = StagePhase.StageClear;
         _currentWave = 0;           // 웨이브 초기화
         _phaseTimer = 0f;           // 타이머 초기화
         _phase = StagePhase.Waiting;// 대기 단계로 전환
