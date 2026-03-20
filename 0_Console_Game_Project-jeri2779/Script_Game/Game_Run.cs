@@ -8,6 +8,8 @@ public class Run_Game : GameApp //1. GameApp을 상속받아 SnakeGame 클래스
 {
     private readonly SceneManager<Scene> _scenes = new SceneManager<Scene>(); // 씬 매니저 (게임 씬 관리)
 
+    private readonly GameData _gameData = new GameData();
+
     public Run_Game(int width, int height) : base(width, height)
     {
     }
@@ -46,7 +48,7 @@ public class Run_Game : GameApp //1. GameApp을 상속받아 SnakeGame 클래스
     }
     public void ChangedToPlay()
     {
-        var play = new Playing(Buffer.Width, Buffer.Height);                 // 플레이 씬 생성
+        var play = new Playing(Buffer.Width, Buffer.Height, _gameData);                 // 플레이 씬 생성
         play.OnPlayAgain += ChangedToTitle;         // 플레이 씬에서 게임 오버 이벤트 구독
         _scenes.ChangeScene(play);                  // 플레이 씬으로 변경
     }
