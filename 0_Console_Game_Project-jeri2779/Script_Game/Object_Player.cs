@@ -48,8 +48,7 @@ namespace Framework.Engine
             HandleInput(); // 키 입력 처리
             Move(deltaTime);
             Shoot(deltaTime);
-            //Bullet = new Bullet(Scene, _x, _y - 1);   // 총알 생성 (플레이어 바로 위)
-            //Scene.AddGameObject(Bullet);              // 총알을 씬에 추가
+            
            
             //throw new NotImplementedException();
         }
@@ -86,7 +85,13 @@ namespace Framework.Engine
                 Y = nextY;
             }
         }
-         
+        public void ResetPostion(float x, float y)
+        {
+            X = x;
+            Y = y;
+            IsActive = true;
+        }
+
 
         private void HandleInput()
         {

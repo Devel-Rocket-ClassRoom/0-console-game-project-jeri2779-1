@@ -46,7 +46,9 @@ class Enemy : GameObject
         if(X >= Wall.Left && X <= Wall.Right        // 적의 X 좌표가 벽의 왼쪽과 오른쪽 사이에 있는지 확인
             && Y >= Wall.Top && Y <= Wall.Bottom)   // 적의 Y 좌표가 벽의 위쪽과 아래쪽 사이에 있는지 확인
         {
-            buffer.SetCell((int)X, (int)Y, 'V', ConsoleColor.Red);
+            buffer.SetCell((int)X, (int)Y, 'O', ConsoleColor.Red);
+            buffer.SetCell((int)X - 1, (int)Y, 'V', ConsoleColor.Red);
+            buffer.SetCell((int)X + 1, (int)Y, 'V', ConsoleColor.Red);
         }
     }
     public override void Update(float deltaTime)

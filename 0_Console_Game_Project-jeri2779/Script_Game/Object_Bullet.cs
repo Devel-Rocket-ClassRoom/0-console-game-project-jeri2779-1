@@ -19,12 +19,12 @@ internal class Bullet : GameObject
                     float dirX, float dirY, float speed, string name) : base(scene)
     {
          
-        Name = name;
+        Name = name;                                                    //player/enemy 총알 구분용 
         X = x;                                                          // 총알의 초기 X 좌표  
         Y = y;                                                          // 총알의 초기 Y 좌표  
         _dirX = dirX;                                                   // 총알의 이동 방향 벡터 X 
         _dirY = dirY;                                                   // 총알의 이동 방향 벡터 Y  
-        _speed = speed;                                               // 총알의 속도 설정
+        _speed = speed;                                                 // 총알의 속도 설정
     }
 
 

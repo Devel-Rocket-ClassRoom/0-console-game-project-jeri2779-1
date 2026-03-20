@@ -59,7 +59,11 @@ public class Playing : Scene
         //wall.Draw(buffer); // 벽 그리기
         // 게임 씬 그리기 로직 
         DrawGameObjects(buffer);
-        _player.Draw(buffer); // 플레이어 그리기(항상 마지막)
+        if(!_isStageClear && _isAllClear)// 스테이지 클리어 또는 올 클리어 상태가 아닐 때만 플레이어 그리기
+        {
+            _player.Draw(buffer); // 플레이어 그리기(항상 마지막)
+        }
+        //_player.Draw(buffer); // 플레이어 그리기(항상 마지막)
 
          
         //플레이어는 반드시 마지막에 그리도록 해야함(총알이 플레이어 덮는것 방지)
@@ -104,10 +108,17 @@ public class Playing : Scene
         AddGameObject(_player);
 
         _stageManager = new StageManager(this, _gameData);
-        _stageManager.OnStageClear += () => { _isStageClear = true; _stageTimer = 0; };   // 스테이지 클리어 이벤트 구독
-        _stageManager.OnAllStageClear += () => { _isAllClear = true;};  // 스테이지 올클리어 이벤트 구독
-
-
+        _stageManager.OnStageClear += () => 
+        {
+            _isStageClear = true; 
+            _stageTimer = 0; 
+            ClearState();
+        };
+        _stageManager.OnAllStageClear += () =>
+        {
+            _isAllClear = true;
+            ClearState();
+        };
         //throw new NotImplementedException();
     }
     public override void Unload()
@@ -128,6 +139,9 @@ public class Playing : Scene
             if (_stageTimer >= _stageWaitTime)
             {
                 _isStageClear = false;
+                _player.ResetPostion(_boundWidth / 2, _boundHeight - 3);            // 플레이어 위치 초기화
+                _player.IsActive = true; // 플레이어 활성화
+                  
             }
             return;
         }
@@ -158,11 +172,30 @@ public class Playing : Scene
             _player.IsActive = false; // 플레이어 비활성화
             if (Input.IsKeyDown(ConsoleKey.Enter))
             {
-                _isGameOver = false;
+                _isAllClear = false;
                 OnPlayAgain?.Invoke();
             }
             return;
         }
+
+    }
+
+    private void ClearState()
+    {
+        //플레이어를 제외한 모든 오브젝트 제거  
+        foreach (var obj in FindGameObjectsAll("Player_Bullet")) // 게임 오브젝트 리스트를 순회하면서 모든 오브젝트 제거
+        {
+            RemoveGameObject(obj);
+        }
+        foreach (var obj in FindGameObjectsAll("Enemy")) // 게임 오브젝트 리스트를 순회하면서 모든 오브젝트 제거
+        {
+            RemoveGameObject(obj);
+        }
+        foreach (var obj in FindGameObjectsAll("Enemy_Bullet")) // 게임 오브젝트 리스트를 순회하면서 모든 오브젝트 제거
+        {
+            RemoveGameObject(obj);
+        }
+        _player.IsActive = false;
 
     }
 
@@ -216,10 +249,6 @@ public class Playing : Scene
 
         }
         //현재방식은 모든 총알이 플레이어와 충돌체크를 하기 때문에 총알이 많아질수록 성능이 저하될 수 있음
-        
-
-
-
 
     }
 
