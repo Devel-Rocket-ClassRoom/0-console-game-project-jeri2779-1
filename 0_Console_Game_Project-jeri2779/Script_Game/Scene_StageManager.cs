@@ -96,8 +96,9 @@ internal class StageManager
             OnAllStageClear?.Invoke(); // 모든 스테이지 클리어 이벤트 호출
             return;
         }
+        OnStageClear?.Invoke();    // 스테이지 클리어 이벤트 호출
+
         _gameData.Stage++;          // 다음 스테이지로 이동
-        _phase = StagePhase.StageClear;
         _currentWave = 0;           // 웨이브 초기화
         _phaseTimer = 0f;           // 타이머 초기화
         _phase = StagePhase.Waiting;// 대기 단계로 전환
@@ -117,10 +118,12 @@ internal class StageManager
 
     private void SpawnBoss()// 보스 스폰 메서드
     {
-        var bossWave = CurrentStage.BossWave;
+        var bossWave = CurrentStage.BossWave;                           // 보스 웨이브 정보
         float centerX = (Wall.Left + Wall.Right) / 2f;
-        var pattern = bossWave.Patterns[0];
+        var pattern = bossWave.Patterns[0];//보스 패턴 여러개일경우 절차적으로 선택 가능하도록 수정 필요                             
+
         _scene.AddGameObject(new Enemy(_scene, centerX, Wall.Top, pattern));
+        //임시로 Enemy 클래스 사용, 보스 전용 클래스로 변경 필요
     }
 }
 
