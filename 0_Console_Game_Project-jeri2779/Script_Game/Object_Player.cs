@@ -20,7 +20,9 @@ namespace Framework.Engine
         private int _dirX;                                           // 이동 방향 X (-1, 0, 1)
         private int _dirY;                                           // 이동 방향 Y (-1, 0, 1)
 
-     
+        public int AttackDamage { get; private set; } = 1;                     // 공격력 
+
+
         private float _shootTimer;                                  // 총알 발사 타이머
         private const float _shootInterval = 0.1f;                  // 총알 발사 간격 (초)
 

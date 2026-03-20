@@ -12,6 +12,8 @@ class Enemy : GameObject
     private Action<Scene, float, float> _shootPattern;                        
     private Action<Scene, float, float, float, float> _aimPattern; // 적의 총알 발사 패턴을 정의 델리게이트 (확장) 유도 패턴용
 
+    public event GameAction OnDied;                      // 적이 죽었을 때 발생하는 이벤트
+
     //private float _posY;                          // 적의 Y 좌표  
     //private float _posX; 
 
@@ -95,7 +97,7 @@ class Enemy : GameObject
         _health -= damage;                           // 적의 체력 감소
         if (_health <= 0)                           // 적의 체력이 0 이하가 되면 제거
         {
-            Scene.RemoveGameObject(this);
+            OnDied?.Invoke();                   // 적이 죽었을 때 이벤트 발생
         }
     }   
 

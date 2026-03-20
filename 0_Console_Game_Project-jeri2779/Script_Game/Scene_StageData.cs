@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Framework.Engine;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using Framework.Engine;
+using static StageData;
 
 internal class StageData
 {
@@ -13,12 +14,18 @@ internal class StageData
         public int EnemyHP { get; set; }                 // 적의 체력   
         public float ShootInterval { get; set; }        // 적이 총알을 발사하는 간격
         public Action<Scene, float, float>[] Patterns;  // 적의 총알 발사 패턴을 정의
-    }
-    internal class StageInfo// 스테이지 정보 클래스
-    {
-        public WaveData[] Waves { get; set; }            // 일반 웨이브 정보 배열
-        public WaveData BossWave { get; set; }           // 보스 웨이브 정보
-        public float WaitTime { get; set; }               // 스테이지 시작 전 대기 시간
+        public BossPhase[] Phases { get; set; }              // 보스 웨이브에서 각 패턴이 적용되는 페이즈
+}
+internal class StageInfo// 스테이지 정보 클래스
+{
+    public WaveData[] Waves { get; set; }            // 일반 웨이브 정보 배열
+    public WaveData BossWave { get; set; }           // 보스 웨이브 정보
+    public float WaitTime { get; set; }               // 스테이지 시작 전 대기 시간
+}
+internal class BossPhase// 보스 페이즈 정보 클래스
+{
+    public float HpThreshold { get; set; }           // 보스 체력 임계값 (0~1 사이)
+    public Action<Scene, float, float> Patterns;  // 해당 페이즈에서 적용되는 총알 패턴
     }
 
     public static StageInfo[] All { get; } = new StageInfo[] // 모든 스테이지 정보
@@ -33,37 +40,68 @@ internal class StageData
         WaitTime = 2f,
         Waves = new WaveData[]
         {
-            new WaveData { EnemyCount = 2, WaveTime = 30f,
-                Patterns = new Action<Scene, float, float>[] { BPatterns.Spread3 } },
-            new WaveData { EnemyCount = 3, WaveTime = 30f,
+            new WaveData
+            {
+                EnemyCount = 2,
+                WaveTime = 30f,
+                EnemyHP = 3,
+                Patterns = new Action<Scene, float, float>[] { BPatterns.Spread3 }
+            },
+            new WaveData
+            {
+                EnemyCount = 3,
+                WaveTime = 30f,
+                EnemyHP = 4,
                 Patterns = new Action<Scene, float, float>[] { BPatterns.Spread5 } },
         },
         BossWave = new WaveData
         {
             EnemyCount = 1,
             WaveTime = 60f,
-            Patterns = new Action<Scene, float, float>[] { BPatterns.Circle8 }
+            EnemyHP = 10,
+            Phases = new BossPhase[]
+    {
+        new BossPhase { HpThreshold = 1.0f, Patterns = BPatterns.Spread3 },
+        new BossPhase { HpThreshold = 0.7f, Patterns = BPatterns.Circle8 },
+        new BossPhase { HpThreshold = 0.4f, Patterns = BPatterns.Spread5 },
+    }
         },
     };
 
-    private static StageInfo Stage2() => new StageInfo
+private static StageInfo Stage2() => new StageInfo
+{
+    // 스테이지 2
+    WaitTime = 2f,
+    Waves = new WaveData[]
     {
-        // 스테이지 2
-        WaitTime = 2f,
-        Waves = new WaveData[]
+            new WaveData
+            {
+                EnemyCount = 4,
+                WaveTime = 30f,
+                EnemyHP = 5,
+                Patterns = new Action<Scene, float, float>[] { BPatterns.Spread3 }
+            },
+            new WaveData
+            {
+                EnemyCount = 5,
+                WaveTime = 30f,
+                EnemyHP = 6,
+                Patterns = new Action<Scene, float, float>[] { BPatterns.Spread5, BPatterns.Circle8 }
+            },
+    },
+    BossWave = new WaveData
+    {
+        EnemyCount = 1,
+        WaveTime = 60f,
+        EnemyHP = 15,
+        Phases = new BossPhase[]
         {
-            new WaveData { EnemyCount = 4, WaveTime = 30f,
-                Patterns = new Action<Scene, float, float>[] { BPatterns.Spread3 } },
-            new WaveData { EnemyCount = 5, WaveTime = 30f,
-                Patterns = new Action<Scene, float, float>[] { BPatterns.Spread5, BPatterns.Circle8 } },
-        },
-        BossWave = new WaveData
-        {
-            EnemyCount = 1,
-            WaveTime = 60f,
-            Patterns = new Action<Scene, float, float>[] { BPatterns.Circle8,BPatterns.Spread5, BPatterns.Spread3 }
-        },
-    };
+        new BossPhase { HpThreshold = 1.0f, Patterns = BPatterns.Spread5  },
+        new BossPhase { HpThreshold = 0.7f, Patterns = BPatterns.Circle8  },
+        new BossPhase { HpThreshold = 0.4f, Patterns = BPatterns.Spread3  },
+        }
+    },
+};
 
 
 
