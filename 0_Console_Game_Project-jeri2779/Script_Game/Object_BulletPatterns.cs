@@ -7,10 +7,12 @@ using Framework.Engine;
 internal class BPatterns
 {
     //Bullet 매개변수 정리 
+    //
     // scene: 총알이 생성될 씬
     // x, y: 총알이 생성될 위치
     // dirX, dirY: 총알의 이동 방향  
     // speed: 총알의 이동 속도
+    // Bullet 카테고리 : 문자열로 구분 추후 변경 고려
 
     public static void Spread3(Scene scene, float x, float y)                               // 3방향 확산
     {
@@ -78,6 +80,10 @@ public static void Spread5(Scene scene, float x, float y)                       
 
 
 }
+
+//총알의 패턴 생성 로직을 더 N-way식으로 더 식을 통일화개선 고려
+//N에 숫자를 입력해서 3,5,8way 등 다양한 패턴을 만들 수 있도록 개선 고려
+
 
 
 

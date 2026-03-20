@@ -20,16 +20,9 @@ namespace Framework.Engine
         private int _dirX;                                           // 이동 방향 X (-1, 0, 1)
         private int _dirY;                                           // 이동 방향 Y (-1, 0, 1)
 
-        //private int _x;//
-        //private int _y;// 플레이어의 현재 위치
+     
         private float _shootTimer;                                  // 총알 발사 타이머
         private const float _shootInterval = 0.1f;                  // 총알 발사 간격 (초)
-
-        //public (int X, int Y) Pos => ((int)X, (int)Y);              // 플레이어의 현재 위치 반환
-
-       
-
-         
 
 
 

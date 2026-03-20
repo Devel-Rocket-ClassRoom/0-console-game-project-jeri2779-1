@@ -64,7 +64,7 @@ internal class Bullet : GameObject
         }
         else if (Name == "Enemy_Bullet")
         {
-            buffer.SetCell((int)X, (int)Y, '.', ConsoleColor.White);             // 적 총알은 흰색 표시
+            buffer.SetCell((int)X, (int)Y, 'o', ConsoleColor.White);             // 적 총알은 흰색 표시
 
         }
     }
