@@ -14,8 +14,8 @@ namespace Framework.Engine
         private const float SpeedY = 10.0f;
         
 
-        private float _moveTimerX;                                  // 이동 타이머
-        private float _moveTimerY;
+        //private float _moveTimerX;                                  // 이동 타이머
+        //private float _moveTimerY;
 
         private int _dirX;                                           // 이동 방향 X (-1, 0, 1)
         private int _dirY;                                           // 이동 방향 Y (-1, 0, 1)

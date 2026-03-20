@@ -50,7 +50,7 @@ public class Run_Game : GameApp //1. GameApp을 상속받아 SnakeGame 클래스
     {
         _gameData.Life = 3;
         _gameData.Stage = 1;
-        _gameData.Score = 0;    
+        //_gameData.Score = 0;    
 
         var play = new Playing(Buffer.Width, Buffer.Height, _gameData);                 // 플레이 씬 생성
         play.OnPlayAgain += ChangedToTitle;         // 플레이 씬에서 게임 오버 이벤트 구독

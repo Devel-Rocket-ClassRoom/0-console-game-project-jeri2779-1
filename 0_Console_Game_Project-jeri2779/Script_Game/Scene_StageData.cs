@@ -27,6 +27,7 @@ internal class StageData
 
     private static StageInfo Stage1() => new StageInfo      //밑의 StageInfo 정보 생성
     {
+        // 스테이지 1 
         WaitTime = 2f,
         Waves = new WaveData[]
         {
@@ -45,6 +46,7 @@ internal class StageData
 
     private static StageInfo Stage2() => new StageInfo
     {
+        // 스테이지 2
         WaitTime = 2f,
         Waves = new WaveData[]
         {

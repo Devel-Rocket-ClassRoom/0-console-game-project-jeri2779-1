@@ -9,7 +9,7 @@ public class Playing : Scene
 {
     private Wall wall;                    // 벽 오브젝트
     private Player player;                // 플레이어 오브젝트
-    private Enemy enemy;                  // 적 오브젝트
+    //private Enemy enemy;                  // 적 오브젝트
 
     private int boundWidth;                // 게임 화면 너비
     private int boundHeight;               // 게임 화면 높이
@@ -17,6 +17,7 @@ public class Playing : Scene
 
     
     private bool isGameOver;              // 게임 오버 상태 변수
+    private bool _isAllClear = false;
 
     public event GameAction OnPlayAgain;  // 다시 시작 이벤트
     public event GameAction OnGameOver;   // 게임 오버 이벤트
@@ -66,6 +67,12 @@ public class Playing : Scene
             buffer.WriteTextCentered(10, $"Score: {_stageScore}", ConsoleColor.Yellow);
             buffer.WriteTextCentered(12, "Press ENTER to Retry", ConsoleColor.White);
         }
+        if (_isAllClear)
+        {
+            buffer.WriteTextCentered(8, "All Stages Clear!", ConsoleColor.Yellow);
+            buffer.WriteTextCentered(10, $"Score: {_stageScore}", ConsoleColor.Green);
+            
+        }
         //throw new NotImplementedException();
     }
     public override void Load() //Awake()
@@ -83,6 +90,7 @@ public class Playing : Scene
         AddGameObject(player);
 
         _stageManager = new StageManager(this, _gameData);
+        _stageManager.OnAllStageClear += () => _isAllClear = true;       // 스테이지 클리어 이벤트 구독
 
 
         //throw new NotImplementedException();
@@ -107,6 +115,16 @@ public class Playing : Scene
         UpdateGameObjects(deltaTime);    
         CheckCollisions();              // 충돌 체크 호출
         _stageManager.Update(deltaTime); // 스테이지 매니저 업데이트 호출
+
+        if(_isAllClear)
+        {
+            if (Input.IsKeyDown(ConsoleKey.Enter))
+            {
+                isGameOver = false;
+                OnPlayAgain?.Invoke();
+            }
+            return ;
+        }
 
     }
 

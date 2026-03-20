@@ -13,9 +13,12 @@ internal class StageManager
     private float _phaseTimer = 0f;
 
     private int _currentWave = 0;
-    private int _killCount = 0;
+    //private int _killCount = 0;
 
     private StageData.StageInfo CurrentStage => StageData.All[_gameData.Stage - 1]; // 현재 스테이지 정보
+
+    public event GameAction OnAllStageClear; // 스테이지 클리어 이벤트
+    public event GameAction OnStageClear;
 
     internal enum StagePhase
     {
@@ -63,7 +66,7 @@ internal class StageManager
         if (enemies.Count > 0) return;
         _currentWave++;
 
-        if(_currentWave < CurrentStage.Waves.Length)    // 다음 웨이브가 남아있으면 스폰
+        if (_currentWave < CurrentStage.Waves.Length)    // 다음 웨이브가 남아있으면 스폰
         {
             SpawnWave(_currentWave);
         }
@@ -80,7 +83,7 @@ internal class StageManager
     }
     private void UpdateBossFight(float deltaTime)
     {
-        var bosses = _scene.FindGameObjectsAll("Enemy");   
+        var bosses = _scene.FindGameObjectsAll("Enemy");
         if (bosses.Count == 0)
         {
             _phase = StagePhase.StageClear;              // 보스 처치되면 스테이지 클리어 전환
@@ -88,7 +91,11 @@ internal class StageManager
     }
     private void UpdateStageClear(float deltaTime)
     {
-        if(_gameData.Stage >= StageData.All.Length) return; // 마지막 스테이지면 종료
+        if (_gameData.Stage >= StageData.All.Length)
+        {
+            OnAllStageClear?.Invoke(); // 모든 스테이지 클리어 이벤트 호출
+            return;
+        }
         _gameData.Stage++;          // 다음 스테이지로 이동
         _phase = StagePhase.StageClear;
         _currentWave = 0;           // 웨이브 초기화
@@ -99,12 +106,12 @@ internal class StageManager
     {
         var wave = CurrentStage.Waves[waveIndex];                       // 웨이브 정보
         int spacing = (Wall.Right - Wall.Left) / (wave.EnemyCount + 1);// 적 간격 계산
-        for(int i = 0; i < wave.EnemyCount; i++)
+        for (int i = 0; i < wave.EnemyCount; i++)
         {
-            float spawnX = Wall.Left + spacing * (i + 1); // 스폰 위치 X 계산
-            
-            var pattern = wave.Patterns[i % wave.Patterns.Length]; // 웨이브 패턴 선택
-            _scene.AddGameObject(new Enemy( _scene, spawnX,Wall.Top, pattern)); // 씬에 적 추가
+            float spawnX = Wall.Left + spacing * (i + 1);               // 스폰 위치 X 계산
+
+            var pattern = wave.Patterns[i % wave.Patterns.Length];      // 웨이브 패턴 선택
+            _scene.AddGameObject(new Enemy(_scene, spawnX, Wall.Top, pattern)); // 씬에 적 추가
         }
     }
 
@@ -116,4 +123,6 @@ internal class StageManager
         _scene.AddGameObject(new Enemy(_scene, centerX, Wall.Top, pattern));
     }
 }
+
+    
  
