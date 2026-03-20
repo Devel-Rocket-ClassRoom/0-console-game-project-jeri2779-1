@@ -35,7 +35,7 @@ public class Playing : Scene
     private StageManager _stageManager;          // 스테이지 매니저 참조
 
     //private int _life;                         // 생명 변수
-    private int _stageScore;
+    //private int _stageScore;
     //private bool _isGameOver;
 
 
@@ -68,27 +68,42 @@ public class Playing : Scene
          
         //플레이어는 반드시 마지막에 그리도록 해야함(총알이 플레이어 덮는것 방지)
         buffer.WriteText(1, 0, $"Life: {_gameData.Life}", ConsoleColor.Cyan);
-        buffer.WriteText(1, 1, $"Score: {_stageScore}", ConsoleColor.Green);
+        buffer.WriteText(1, 1, $"Score: {_gameData.Score}", ConsoleColor.Green);
         buffer.WriteText(15,1, $"Stage: {_gameData.Stage}", ConsoleColor.Magenta);
+        if(_stageManager.Phase == StageManager.StagePhase.BossFight)
+        {
+            buffer.WriteText(20,0, $"Time: {(int)_stageManager._bossTimeRemains} ");
+        }
+        if (_stageManager.Phase == StageManager.StagePhase.WaveSpawn)
+        {
+            buffer.WriteText(15, 0, $"Wave Time: {(int)_stageManager._waveTimeRemains}s", ConsoleColor.Yellow);
+        }
 
         if (_isGameOver)//게임 오버 상태 화면
         {
             buffer.WriteTextCentered(8, "Game Over", ConsoleColor.Red);
-            buffer.WriteTextCentered(10, $"Score: {_stageScore}", ConsoleColor.Yellow);
+            buffer.WriteTextCentered(10, $"Score: {_gameData.Score}", ConsoleColor.Yellow);
             buffer.WriteTextCentered(12, "ENTER to Retry", ConsoleColor.White);
         }
         if (_isAllClear)//모든 스테이지 클리어 상태 화면
         {
             buffer.WriteTextCentered(8, "All Stages Clear!", ConsoleColor.Yellow);
-            buffer.WriteTextCentered(10, $"Score: {_stageScore}", ConsoleColor.Green);
+            buffer.WriteTextCentered(10, $"Score: {_gameData.Score}", ConsoleColor.Green);
             buffer.WriteTextCentered(12, "ENTER to Re-Play", ConsoleColor.White);
         }
 
         if (_isStageClear)
         {
             buffer.WriteTextCentered(8, $"Stage {_gameData.Stage - 1} Clear!", ConsoleColor.Yellow);
-            buffer.WriteTextCentered(10, $"Score: {_stageScore}", ConsoleColor.Green);
+            buffer.WriteTextCentered(10, $"Score: {_gameData.Score}", ConsoleColor.Green);
             buffer.WriteTextCentered(12, $"Kills: {_killCount}", ConsoleColor.White);
+            
+        }
+        else if(_stageManager.Phase == StageManager.StagePhase.Waiting)
+        {
+            buffer.WriteTextCentered(8, $"Stage {_gameData.Stage} Start!", ConsoleColor.Yellow);
+            buffer.WriteTextCentered(14, $"Time Remaining: {(int)_stageManager._phaseTimeRemains + 1:F1}s", ConsoleColor.Green);
+
         }
         //throw new NotImplementedException();
     }
@@ -96,7 +111,7 @@ public class Playing : Scene
     public override void Load() //Awake()
     {
          
-        _stageScore = 0;
+        _gameData.Score = 0;
         _isGameOver = false;
 
 
@@ -221,7 +236,8 @@ public class Playing : Scene
                     RemoveGameObject(bullet);
                     //체력 시스템을 구현할시 remove를 다른곳에서 하고 대신 대미지 관련 로직을 넣을수도 있음
                     RemoveGameObject(enemy);
-                    _stageScore += 10;
+
+                    _gameData.Score += 10;
                     _killCount++;
                     break;                              // 한 총알이 여러 적과 충돌하는 것을 방지하기 위해 내부 루프 탈출
                 }

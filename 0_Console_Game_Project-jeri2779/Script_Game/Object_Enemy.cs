@@ -12,31 +12,35 @@ class Enemy : GameObject
     private Action<Scene, float, float> _shootPattern;                        
     private Action<Scene, float, float, float, float> _aimPattern; // 적의 총알 발사 패턴을 정의 델리게이트 (확장) 유도 패턴용
 
-    //private float _posY;                    // 적의 Y 좌표  
+    //private float _posY;                          // 적의 Y 좌표  
     //private float _posX; 
 
-    private float _speed = 8.0f;                // 적의 이동 속도
-    private float _targetPos = 5.0f;             // 적이 이동할 목표 Y 좌표 (적이 이 위치에 도달하면 정지)
+    private float _speed = 8.0f;                    // 적의 이동 속도
+    private float _targetPos = 5.0f;                // 적이 이동할 목표 Y 좌표 (적이 이 위치에 도달하면 정지)
 
     private float _shootTimer;
-    private float _shootInterval = 3.0f;       // 총알 발사 간격 (초)
+    private float _shootInterval = 3.0f;            // 총알 발사 간격 (초)
+
+    private int _health = 10;                       // 적의 체력   
 
 
     // 적이 이동할 목표 위치
-    public Enemy(Scene scene, float startX, float startY, 
+    public Enemy(Scene scene, int hp, float startX, float startY, 
                 Action<Scene, float, float> shootPattern) : base(scene)
     {
         Name = "Enemy";
         X = startX;
         Y = startY;                     // 적의 초기 위치 설정
+        _health = hp;                   // 적의 체력 설정
         _shootPattern = shootPattern; // 총알 발사 패턴 설정
     }
-    public Enemy(Scene scene, float startX, float startY,
+    public Enemy(Scene scene, int hp, float startX, float startY,
                 Action<Scene, float, float, float, float> aimPattern) : base(scene)//유도 패턴 생성자 확장
     {
         Name = "Enemy";
         X = startX;
         Y = startY;                     // 적의 초기 위치 설정
+        _health = hp;                   // 적의 체력 설정
         _aimPattern = aimPattern;       // 유도 패턴 설정 (확장)
     }
 
@@ -82,8 +86,19 @@ class Enemy : GameObject
                 _aimPattern.Invoke(Scene, X, Y, px, py);     //  유도 패턴 실행 (적의 위치와 플레이어의 위치 전달)
             }
         }
+
+
     }
 
- 
+    public void TakeDamage(int damage)
+    {
+        _health -= damage;                           // 적의 체력 감소
+        if (_health <= 0)                           // 적의 체력이 0 이하가 되면 제거
+        {
+            Scene.RemoveGameObject(this);
+        }
+    }   
+
+
 }
 

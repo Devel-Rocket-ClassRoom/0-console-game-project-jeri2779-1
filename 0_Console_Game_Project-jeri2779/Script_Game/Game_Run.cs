@@ -41,6 +41,9 @@ public class Run_Game : GameApp //1. GameApp을 상속받아 SnakeGame 클래스
 
     public void ChangedToTitle()
     {
+        _gameData.Life = 3;
+        _gameData.Stage = 1;
+        _gameData.Score = 0;
         //_scenes.ChangeScene(new TitleScene()); // 타이틀 씬으로 변경
         var title = new Start();               // 타이틀 씬 생성
         title.OnStartGame += ChangedToPlay;         // 타이틀 씬에서 게임 시작 이벤트 구독
@@ -50,7 +53,7 @@ public class Run_Game : GameApp //1. GameApp을 상속받아 SnakeGame 클래스
     {
         _gameData.Life = 3;
         _gameData.Stage = 1;
-        //_gameData.Score = 0;    
+        _gameData.Score = 0;    
 
         var play = new Playing(Buffer.Width, Buffer.Height, _gameData);                 // 플레이 씬 생성
         play.OnPlayAgain += ChangedToTitle;         // 플레이 씬에서 게임 오버 이벤트 구독

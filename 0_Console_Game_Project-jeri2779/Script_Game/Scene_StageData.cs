@@ -9,6 +9,8 @@ internal class StageData
     {
         public int EnemyCount { get; set; }             // 웨이브당 적의 수
         public float WaveTime { get; set; }             // 웨이브 지속 시간
+
+        public int EnemyHP { get; set; }                 // 적의 체력   
         public float ShootInterval { get; set; }        // 적이 총알을 발사하는 간격
         public Action<Scene, float, float>[] Patterns;  // 적의 총알 발사 패턴을 정의
     }

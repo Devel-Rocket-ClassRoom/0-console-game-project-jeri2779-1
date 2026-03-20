@@ -64,6 +64,11 @@ namespace Framework.Engine
                 _shootTimer = 0;                        // 총알 발사 타이머 초기화
                 bullet = new Bullet(Scene, X, Y - 1, 0, -1, SpeedY + 1, "Player_Bullet"); // 총알 생성 (플레이어 바로 위)
                 Scene.AddGameObject(bullet);            // 총알을 씬에 추가
+                //bullet = new Bullet(Scene, X, Y - 1, -0.5f, -1, SpeedY + 1, "Player_Bullet"); // 왼쪽 대각선
+
+                //Scene.AddGameObject(bullet);            // 총알을 씬에 추가
+                //bullet = new Bullet(Scene, X, Y - 1, 0.5f, -1, SpeedY + 1, "Player_Bullet"); // 오른쪽 대각선
+                //Scene.AddGameObject(bullet);
             }
         }
         public void Move(float deltaTime)

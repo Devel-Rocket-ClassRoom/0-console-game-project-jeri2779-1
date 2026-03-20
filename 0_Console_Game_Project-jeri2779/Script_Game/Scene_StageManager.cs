@@ -11,6 +11,13 @@ internal class StageManager
 
     private StagePhase _phase = StagePhase.Waiting;
     private float _phaseTimer = 0f;
+    private float _bossTimer = 0f;
+
+    private float _waveTimer = 0f;
+
+    public float _waveTimeRemains => CurrentStage.Waves[_currentWave].WaveTime - _waveTimer; // 현재 웨이브 남은 시간 계산
+    public float _phaseTimeRemains => CurrentStage.WaitTime - _phaseTimer; // 다음 웨이브 스폰까지 남은 시간 계산
+    public float _bossTimeRemains => CurrentStage.BossWave.WaveTime - _bossTimer; // 보스 전투 남은 시간 계산
 
     private int _currentWave = 0;
     //private int _killCount = 0;
@@ -62,8 +69,22 @@ internal class StageManager
     }
     private void UpdateWaveSpawn(float deltaTime)
     {
+        _waveTimer += deltaTime;
+
         var enemies = _scene.FindGameObjectsAll("Enemy"); // 씬에서 모든 적 객체 찾기
-        if (enemies.Count > 0) return;
+        bool timeOver = _waveTimer >= CurrentStage.Waves[_currentWave].WaveTime;//웨이브 시간이 초과되었는지 확인
+        bool allKilled = enemies.Count == 0;
+        if (!timeOver && !allKilled) return;
+
+        if(timeOver)
+        {
+            foreach(var enemys in enemies)
+            {
+                _scene.RemoveGameObject(enemys); // 웨이브 시간이 초과되면 남아있는 적 모두 제거
+                 
+            }
+        }
+        _waveTimer = 0f;
         _currentWave++;
 
         if (_currentWave < CurrentStage.Waves.Length)    // 다음 웨이브가 남아있으면 스폰
@@ -72,7 +93,7 @@ internal class StageManager
         }
         else
         {
-            _phase = StagePhase.BossSpawn;              // 모든 웨이브가 끝나면 보스 스폰 단계로 전환
+            _phase = StagePhase.BossSpawn;                      // 모든 웨이브가 끝나면 보스 스폰 단계로 전환
         }
     }
     private void UpdateBossSpawn(float deltaTime)
@@ -81,15 +102,18 @@ internal class StageManager
         _phase = StagePhase.BossFight;                // 보스 전투 단계로 전환
 
     }
-    private void UpdateBossFight(float deltaTime)
+    private void UpdateBossFight(float deltaTime)             // 보스와의 전투 중 보스가 처치되면 스테이지 클리어로 전환
     {
+        _bossTimer += deltaTime;
+
         var bosses = _scene.FindGameObjectsAll("Enemy");
-        if (bosses.Count == 0)
+        if (bosses.Count == 0 || _bossTimer >= CurrentStage.BossWave.WaveTime)
         {
+            _bossTimer = 0f;
             _phase = StagePhase.StageClear;              // 보스 처치되면 스테이지 클리어 전환
         }
     }
-    private void UpdateStageClear(float deltaTime)
+    private void UpdateStageClear(float deltaTime)          // 스테이지 클리어 후 다음 스테이지로 넘어가기 전까지 대기
     {
         if (_gameData.Stage >= StageData.All.Length)
         {
@@ -112,7 +136,7 @@ internal class StageManager
             float spawnX = Wall.Left + spacing * (i + 1);               // 스폰 위치 X 계산
 
             var pattern = wave.Patterns[i % wave.Patterns.Length];      // 웨이브 패턴 선택
-            _scene.AddGameObject(new Enemy(_scene, spawnX, Wall.Top, pattern)); // 씬에 적 추가
+            _scene.AddGameObject(new Enemy(_scene, wave.EnemyHP, spawnX, Wall.Top, pattern)); // 씬에 적 추가
         }
     }
 
@@ -122,7 +146,7 @@ internal class StageManager
         float centerX = (Wall.Left + Wall.Right) / 2f;
         var pattern = bossWave.Patterns[0];//보스 패턴 여러개일경우 절차적으로 선택 가능하도록 수정 필요                             
 
-        _scene.AddGameObject(new Enemy(_scene, centerX, Wall.Top, pattern));
+        _scene.AddGameObject(new Enemy(_scene, bossWave.EnemyHP, centerX, Wall.Top, pattern));
         //임시로 Enemy 클래스 사용, 보스 전용 클래스로 변경 필요
     }
 }
