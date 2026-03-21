@@ -66,7 +66,13 @@ internal class Boss : GameObject
         {
             _shootTimer = 0f;
             _isInvincible = false;  // 첫 발사 시 무적 해제
-            _phases[_phaseIndex].Patterns?.Invoke(Scene, X, Y);
+            if (_phases[_phaseIndex].Patterns != null)
+            {
+                foreach (var pattern in _phases[_phaseIndex].Patterns)
+                {
+                    pattern?.Fire(Scene, X, Y);
+                }
+            }
         }
     }
 

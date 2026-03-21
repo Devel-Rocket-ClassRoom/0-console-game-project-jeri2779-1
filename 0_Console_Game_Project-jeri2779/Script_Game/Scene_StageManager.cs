@@ -140,7 +140,8 @@ internal class StageManager
             float spawnX = Wall.Left + spacing * (i + 1);                   // 스폰 위치 X 계산
 
             var pattern = wave.Patterns[i % wave.Patterns.Length];          // 웨이브 패턴 선택
-            var enemy = new Enemy(_scene, wave.EnemyHP, spawnX, Wall.Top, pattern, wave.Move); // 적 객체 생성
+            var enemy = new Enemy(_scene, wave.EnemyHP, spawnX, Wall.Top, 
+                                 pattern, wave.Move); // 적 객체 생성
 
              OnEnemySpawned?.Invoke(enemy); // 적이 스폰될 때마다 이벤트 호출
             _scene.AddGameObject(enemy); // 씬에 적 추가
@@ -159,4 +160,3 @@ internal class StageManager
 }
 
     
- 

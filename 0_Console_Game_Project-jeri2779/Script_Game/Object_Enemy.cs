@@ -9,7 +9,7 @@ class Enemy : GameObject
 {
     //Bullet Bullet; // 총알 오브젝트 참조\
 
-    private Action<Scene, float, float> _shootPattern;                        
+    //private Action<Scene, float, float> _shootPattern;                        
 
     public event GameAction OnDied;                      // 적이 죽었을 때 발생하는 이벤트
 
@@ -23,19 +23,20 @@ class Enemy : GameObject
 
     private int _health = 10;                       // 적의 체력   
 
+    private BulletPattern _bulletPattern;                   // 총알 발사 패턴 (추가) BulletPattern 클래스 참조
     private MovePattern _movePattern;                   // 적의 이동 패턴 (추가) MovePattern 클래스 참조
 
 
     // 적이 이동할 목표 위치
     public Enemy(Scene scene, int hp, float startX, float startY, 
-                Action<Scene, float, float> shootPattern, 
+                BulletPattern shootPattern, 
                 MovePattern movePattern) : base(scene)
     {
         Name = "Enemy";
         X = startX;
         Y = startY;                     // 적의 초기 위치 설정
         _health = hp;                   // 적의 체력 설정
-        _shootPattern = shootPattern; // 총알 발사 패턴 설정
+        _bulletPattern = shootPattern; // 총알 발사 패턴 설정
         _movePattern = movePattern;
     }
     //public Enemy(Scene scene, int hp, float startX, float startY,
@@ -96,9 +97,9 @@ class Enemy : GameObject
         {
             _shootTimer = 0;
 
-            if (_shootPattern != null)
+            if (_bulletPattern != null)
             {
-                _shootPattern.Invoke(Scene, X, Y);      // 총알 발사 패턴 실행
+                _bulletPattern.Fire(Scene, X, Y);      // 총알 발사 패턴 실행
             }
             //else if (_aimPattern != null)
             //{

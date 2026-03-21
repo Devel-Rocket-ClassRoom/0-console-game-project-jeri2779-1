@@ -4,6 +4,115 @@ using System.Text;
 using Framework.Engine;
 
 
+
+// ── BulletPattern 추상 클래스 + 하위 클래스 ──────────────────
+internal abstract class BulletPattern
+{
+    public abstract void Fire(Scene scene, float x, float y);
+}
+
+internal class Spread3Pattern : BulletPattern
+{
+    public override void Fire(Scene scene, float x, float y)
+        => BPatterns.Spread3(scene, x, y);
+}
+
+internal class Spread5Pattern : BulletPattern
+{
+    public override void Fire(Scene scene, float x, float y)
+        => BPatterns.Spread5(scene, x, y);
+}
+
+internal class Circle8Pattern : BulletPattern
+{
+    public override void Fire(Scene scene, float x, float y)
+        => BPatterns.Circle8(scene, x, y);
+}
+
+internal class AimedPattern : BulletPattern
+{
+    public override void Fire(Scene scene, float x, float y)
+        => BPatterns.AimedAuto(scene, x, y);
+}
+
+internal class SpreadAimedPattern : BulletPattern
+{
+    public override void Fire(Scene scene, float x, float y)
+        => BPatterns.SpreadAimedAuto(scene, x, y);
+}
+//stateful 패턴 정리===================================================================================
+internal class SpiralPattern : BulletPattern
+{
+    private float _angle = 0f;
+    private readonly float _angleStep;
+    private readonly float _speed;
+
+    public SpiralPattern(float angleStep = 30f, float speed = 6f)
+    {
+        _angleStep = angleStep;
+        _speed = speed;
+    }
+
+    public override void Fire(Scene scene, float x, float y)
+    {
+        float rad = _angle * (MathF.PI / 180f);
+        float dirX = MathF.Cos(rad);
+        float dirY = MathF.Sin(rad);
+        scene.AddGameObject(new Bullet(scene, x, y, dirX, dirY, _speed, "Enemy_Bullet"));
+        _angle += _angleStep;
+        if (_angle >= 360f) _angle -= 360f;
+    }
+}
+
+internal class ZigZag : MovePattern
+{
+    private readonly float _speedX;
+    private readonly float _speedY;
+    private readonly float _rangeX;    // 좌우 이동 범위
+    private float _timer;
+
+    public ZigZag(float speedX, float speedY, float rangeX)
+    {
+        _speedX = speedX;
+        _speedY = speedY;
+        _rangeX = rangeX;
+    }
+
+    public override (float moveX, float moveY) GetMovement(float x, float y, float deltaTime)
+    {
+        _timer += deltaTime;
+        // 삼각파(triangle wave)로 좌우 왕복 + 아래로 직진
+        float t = _timer * _speedX;
+        float zigzag = (MathF.Abs((t % 2f) - 1f) * 2f - 1f) * _rangeX;
+        float moveX = zigzag - (x - Wall.Left - (Wall.Right - Wall.Left) / 2f);
+        return (moveX * deltaTime, _speedY * deltaTime);
+    }
+}
+
+internal class CircleMove : MovePattern
+{
+    private readonly float _speed;      // 회전 속도 (라디안/초)
+    private readonly float _radius;     // 회전 반경
+    private readonly float _centerX;    // 회전 중심 X
+    private readonly float _centerY;    // 회전 중심 Y
+    private float _angle;
+
+    public CircleMove(float centerX, float centerY, float radius, float speed)
+    {
+        _centerX = centerX;
+        _centerY = centerY;
+        _radius = radius;
+        _speed = speed;
+    }
+
+    public override (float moveX, float moveY) GetMovement(float x, float y, float deltaTime)
+    {
+        _angle += _speed * deltaTime;
+        float targetX = _centerX + MathF.Cos(_angle) * _radius;
+        float targetY = _centerY + MathF.Sin(_angle) * _radius;
+        return (targetX - x, targetY - y);  // 현재 위치에서 목표 위치까지의 delta 반환
+    }
+}
 internal class BPatterns
 {
     //Bullet 매개변수 정리 
