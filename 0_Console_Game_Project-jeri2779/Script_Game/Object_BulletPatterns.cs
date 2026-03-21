@@ -55,41 +55,46 @@ public static void Spread5(Scene scene, float x, float y)                       
             scene.AddGameObject(new Bullet(scene, x, y, dirX, dirY, 6f, "Enemy_Bullet"));
         }
     }
+
+    //유도 패턴의 경우 Action의 매개변수가 달라서 그대로 대입하면 전용 시그니처 필요할수 있음
+    // Aimed 메서드는 플레이어 위치를 매개변수로 받아서 그 방향으로 총알을 발사하는 형태로 구현,
+    // Aimed 메서드는 기존 시그니처 유지, AimedAuto 메서드에서 플레이어 좌표를 자동으로 받아와서 Aimed 메서드에 전달하는 형태로 구현.
+    //실제 사용은 Auto붙은 메서드를 사용해야 에러가 나지 않음.
     public static void Aimed(Scene scene, float x, float y, float playerX, float playerY)     // 플레이어 위치를 향해 발사
     {
-        float dx = playerX - x;
-        float dy = playerY - y;
-        float length = (float)Math.Sqrt(dx * dx + dy * dy);
-        if (length == 0) return;
-        scene.AddGameObject(new Bullet(scene, x, y, dx / length, dy / length, 6f, "Enemy_Bullet"));
+        float diffX = playerX - x;
+        float diffY = playerY - y;
+        float distance = (float)Math.Sqrt(diffX * diffX + diffY * diffY);                   // 거리 계산
+        if (distance == 0) return;
+        scene.AddGameObject(new Bullet(scene, x, y, diffX / distance, diffY / distance, 6f, "Enemy_Bullet"));
     }
-    public static void  AimedAuto(Scene scene,float x, float y)
+    public static void  AimedAuto(Scene scene,float x, float y)// 플레이어 위치를 자동으로 찾아서 발사
     {
         var player = scene.FindGameObject("Player");
         float playerX = player != null ? player.X : x;
         float playerY = player != null ? player.Y : y;
-        Aimed(scene, x, y, playerX, playerY);
+        Aimed(scene, x, y, playerX, playerY); 
     }
 
     public static void SpreadAimed(Scene scene, float x, float y, float playerX, float playerY) // 플레이어 위치를 향해 3방향 확산 발사
     {
-        float dx = playerX - x;
-        float dy = playerY - y;
-        float length = (float)Math.Sqrt(dx * dx + dy * dy);
-        if (length == 0) return;
-        float baseDirX = dx / length;
-        float baseDirY = dy / length;
+        float diffX = playerX - x;
+        float diffY = playerY - y;
+        float distance = (float)Math.Sqrt(diffX * diffX + diffY * diffY);
+        if (distance == 0) return;
+        float aimX = diffX / distance;
+        float aimY = diffY / distance;
         // 플레이어 방향 기준으로 좌우 확산
-        scene.AddGameObject(new Bullet(scene, x, y, baseDirX - 0.3f, baseDirY, 6f, "Enemy_Bullet"));
-        scene.AddGameObject(new Bullet(scene, x, y, baseDirX, baseDirY, 6f, "Enemy_Bullet"));
-        scene.AddGameObject(new Bullet(scene, x, y, baseDirX + 0.3f, baseDirY, 6f, "Enemy_Bullet"));
+        scene.AddGameObject(new Bullet(scene, x, y, aimX - 0.3f, aimY, 6f, "Enemy_Bullet"));
+        scene.AddGameObject(new Bullet(scene, x, y, aimX, aimY, 6f, "Enemy_Bullet"));
+        scene.AddGameObject(new Bullet(scene, x, y, aimX + 0.3f, aimY, 6f, "Enemy_Bullet"));
     }
     public static void SpreadAimedAuto(Scene scene, float x, float y)
     {
         var player = scene.FindGameObject("Player");
-        float px = player != null ? player.X : x;
-        float py = player != null ? player.Y : y;
-        SpreadAimed(scene, x, y, px, py);
+        float playerX = player != null ? player.X : x;
+        float playerY = player != null ? player.Y : y;
+        SpreadAimed(scene, x, y, playerX, playerY);
     }
 
 

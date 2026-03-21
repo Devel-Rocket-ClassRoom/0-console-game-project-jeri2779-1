@@ -55,7 +55,7 @@ internal class StageData
                 EnemyCount = 3,
                 WaveTime = 30f,
                 EnemyHP = 4,
-                Patterns = new Action<Scene, float, float>[] { BPatterns.AimedAuto },
+                Patterns = new Action<Scene, float, float>[] { BPatterns.SpreadAimedAuto },
                 Move = new SideToSide(5.0f)
             },
         },
