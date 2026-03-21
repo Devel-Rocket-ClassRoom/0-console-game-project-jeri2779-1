@@ -14,8 +14,7 @@ class Enemy : GameObject
 
     public event GameAction OnDied;                      // 적이 죽었을 때 발생하는 이벤트
 
-    //private float _posY;                          // 적의 Y 좌표  
-    //private float _posX; 
+ 
 
     private float _speed = 8.0f;                    // 적의 이동 속도
     private float _targetPos = 5.0f;                // 적이 이동할 목표 Y 좌표 (적이 이 위치에 도달하면 정지)
@@ -25,25 +24,31 @@ class Enemy : GameObject
 
     private int _health = 10;                       // 적의 체력   
 
+    private MovePattern _movePattern;                   // 적의 이동 패턴 (추가) MovePattern 클래스 참조
+
 
     // 적이 이동할 목표 위치
     public Enemy(Scene scene, int hp, float startX, float startY, 
-                Action<Scene, float, float> shootPattern) : base(scene)
+                Action<Scene, float, float> shootPattern, 
+                MovePattern movePattern) : base(scene)
     {
         Name = "Enemy";
         X = startX;
         Y = startY;                     // 적의 초기 위치 설정
         _health = hp;                   // 적의 체력 설정
         _shootPattern = shootPattern; // 총알 발사 패턴 설정
+        _movePattern = movePattern;
     }
     public Enemy(Scene scene, int hp, float startX, float startY,
-                Action<Scene, float, float, float, float> aimPattern) : base(scene)//유도 패턴 생성자 확장
+                Action<Scene, float, float, float, float> aimPattern, 
+                MovePattern movePattern) : base(scene)//유도 패턴 생성자 확장
     {
         Name = "Enemy";
         X = startX;
         Y = startY;                     // 적의 초기 위치 설정
         _health = hp;                   // 적의 체력 설정
         _aimPattern = aimPattern;       // 유도 패턴 설정 (확장)
+        _movePattern = movePattern;
     }
 
     public override void Draw(ScreenBuffer buffer)
@@ -60,14 +65,30 @@ class Enemy : GameObject
     public override void Update(float deltaTime)
     {
         //적이 위에서 내려오면서 일정시간 후 정지
-        if(Y < _targetPos)                              // 적이 화면 상단에서 내려오는 상태
+        //if(Y < _targetPos)                              // 적이 화면 상단에서 내려오는 상태
+        //{
+        //    Y += _speed * deltaTime;     
+        //}
+        //else
+        //{
+        //                                                // 적이 일정 위치에 도달하면 정지
+        //    Y = _targetPos;  
+        //}
+
+        if(_movePattern != null)
         {
-            Y += _speed * deltaTime;     
-        }
-        else
-        {
-                                                        // 적이 일정 위치에 도달하면 정지
-            Y = _targetPos;  
+            var (moveX, moveY) = _movePattern.GetMovement(X, Y, deltaTime); // 이동 패턴에서 이동량 계산
+            float nextX = X + moveX; // 다음 프레임에서의 X 좌표 계산
+            float nextY = Y + moveY; // 다음 프레임에서의 Y 좌표 계산
+            if(nextX >= Wall.Left && nextX <= Wall.Right) // 다음 프레임에서의 X 좌표가 벽의 범위 내에 있는지 확인
+            {
+                X = nextX; // X 좌표 업데이트
+            }
+            if(nextY >= Wall.Top && nextY <= Wall.Bottom) // 다음 프레임에서의 Y 좌표가 벽의 범위 내에 있는지 확인
+            {
+                Y = nextY; // Y 좌표 업데이트
+            }
+
         }
 
 

@@ -25,8 +25,7 @@ namespace Framework.Engine
 
         private float _shootTimer;                                  // 총알 발사 타이머
         private const float _shootInterval = 0.1f;                  // 총알 발사 간격 (초)
-
-
+ 
 
         public Player(Scene scene, int startX, int startY) : base(scene)
         {
