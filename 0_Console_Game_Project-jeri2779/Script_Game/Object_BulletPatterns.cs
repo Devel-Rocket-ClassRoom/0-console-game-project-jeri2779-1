@@ -63,6 +63,13 @@ public static void Spread5(Scene scene, float x, float y)                       
         if (length == 0) return;
         scene.AddGameObject(new Bullet(scene, x, y, dx / length, dy / length, 6f, "Enemy_Bullet"));
     }
+    public static void  AimedAuto(Scene scene,float x, float y)
+    {
+        var player = scene.FindGameObject("Player");
+        float playerX = player != null ? player.X : x;
+        float playerY = player != null ? player.Y : y;
+        Aimed(scene, x, y, playerX, playerY);
+    }
 
     public static void SpreadAimed(Scene scene, float x, float y, float playerX, float playerY) // 플레이어 위치를 향해 3방향 확산 발사
     {
@@ -76,6 +83,13 @@ public static void Spread5(Scene scene, float x, float y)                       
         scene.AddGameObject(new Bullet(scene, x, y, baseDirX - 0.3f, baseDirY, 6f, "Enemy_Bullet"));
         scene.AddGameObject(new Bullet(scene, x, y, baseDirX, baseDirY, 6f, "Enemy_Bullet"));
         scene.AddGameObject(new Bullet(scene, x, y, baseDirX + 0.3f, baseDirY, 6f, "Enemy_Bullet"));
+    }
+    public static void SpreadAimedAuto(Scene scene, float x, float y)
+    {
+        var player = scene.FindGameObject("Player");
+        float px = player != null ? player.X : x;
+        float py = player != null ? player.Y : y;
+        SpreadAimed(scene, x, y, px, py);
     }
 
 

@@ -10,7 +10,6 @@ class Enemy : GameObject
     //Bullet Bullet; // 총알 오브젝트 참조\
 
     private Action<Scene, float, float> _shootPattern;                        
-    private Action<Scene, float, float, float, float> _aimPattern; // 적의 총알 발사 패턴을 정의 델리게이트 (확장) 유도 패턴용
 
     public event GameAction OnDied;                      // 적이 죽었을 때 발생하는 이벤트
 
@@ -39,17 +38,17 @@ class Enemy : GameObject
         _shootPattern = shootPattern; // 총알 발사 패턴 설정
         _movePattern = movePattern;
     }
-    public Enemy(Scene scene, int hp, float startX, float startY,
-                Action<Scene, float, float, float, float> aimPattern, 
-                MovePattern movePattern) : base(scene)//유도 패턴 생성자 확장
-    {
-        Name = "Enemy";
-        X = startX;
-        Y = startY;                     // 적의 초기 위치 설정
-        _health = hp;                   // 적의 체력 설정
-        _aimPattern = aimPattern;       // 유도 패턴 설정 (확장)
-        _movePattern = movePattern;
-    }
+    //public Enemy(Scene scene, int hp, float startX, float startY,
+    //            Action<Scene, float, float, float, float> aimPattern, 
+    //            MovePattern movePattern) : base(scene)//유도 패턴 생성자 확장
+    //{
+    //    Name = "Enemy";
+    //    X = startX;
+    //    Y = startY;                     // 적의 초기 위치 설정
+    //    _health = hp;                   // 적의 체력 설정
+    //    _aimPattern = aimPattern;       // 유도 패턴 설정 (확장)
+    //    _movePattern = movePattern;
+    //}
 
     public override void Draw(ScreenBuffer buffer)
     {
@@ -101,13 +100,13 @@ class Enemy : GameObject
             {
                 _shootPattern.Invoke(Scene, X, Y);      // 총알 발사 패턴 실행
             }
-            else if (_aimPattern != null)
-            {
-                var player = Scene.FindGameObject("Player"); // 플레이어 오브젝트 참조 (유도 패턴용)
-                float px = player != null ? player.X : X;    // 플레이어의 X 좌표, 플레이어가 없으면 적의 X 좌표 사용
-                float py = player != null ? player.Y : Y;
-                _aimPattern.Invoke(Scene, X, Y, px, py);     //  유도 패턴 실행 (적의 위치와 플레이어의 위치 전달)
-            }
+            //else if (_aimPattern != null)
+            //{
+            //    var player = Scene.FindGameObject("Player"); // 플레이어 오브젝트 참조 (유도 패턴용)
+            //    float px = player != null ? player.X : X;    // 플레이어의 X 좌표, 플레이어가 없으면 적의 X 좌표 사용
+            //    float py = player != null ? player.Y : Y;
+            //    _aimPattern.Invoke(Scene, X, Y, px, py);     //  유도 패턴 실행 (적의 위치와 플레이어의 위치 전달)
+            //}
         }
 
 
