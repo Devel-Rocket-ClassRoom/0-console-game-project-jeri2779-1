@@ -66,26 +66,28 @@ internal class SpiralPattern : BulletPattern
 
 internal class ZigZag : MovePattern
 {
-    private readonly float _speedX;
-    private readonly float _speedY;
-    private readonly float _rangeX;    // 좌우 이동 범위
-    private float _timer;
+    private readonly float _speedX;     // 좌우 이동 속도
+    private readonly float _speedY;     // 하강 속도
+    private readonly float _targetY;    // 하강 멈출 Y 좌표
+    private int _dirX = 1;              // 현재 좌우 방향 (1 or -1)
 
-    public ZigZag(float speedX, float speedY, float rangeX)
+    public ZigZag(float speedX, float speedY, float targetY)
     {
         _speedX = speedX;
         _speedY = speedY;
-        _rangeX = rangeX;
+        _targetY = targetY;
     }
 
     public override (float moveX, float moveY) GetMovement(float x, float y, float deltaTime)
     {
-        _timer += deltaTime;
-        // 삼각파(triangle wave)로 좌우 왕복 + 아래로 직진
-        float t = _timer * _speedX;
-        float zigzag = (MathF.Abs((t % 2f) - 1f) * 2f - 1f) * _rangeX;
-        float moveX = zigzag - (x - Wall.Left - (Wall.Right - Wall.Left) / 2f);
-        return (moveX * deltaTime, _speedY * deltaTime);
+        // 벽에 닿으면 방향 전환
+        if (x <= Wall.Left) _dirX = 1;
+        if (x >= Wall.Right) _dirX = -1;
+
+        float moveX = _dirX * _speedX * deltaTime;
+        float moveY = y < _targetY ? _speedY * deltaTime : 0f;
+
+        return (moveX, moveY);
     }
 }
 
