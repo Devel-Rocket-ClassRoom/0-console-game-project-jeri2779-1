@@ -6,28 +6,33 @@ internal class Boss : GameObject
     private readonly int _maxHp;                    // 보스의 최대 HP
     private int _currentHp;                         // 보스의 현재 HP
 
+    private readonly BossType _bType;                   // 보스의 타입 (추가)
+
     private readonly StageData.BossPhase[] _phases; // 보스의 패턴 정보
     private int _phaseIndex = 0;                    // 현재 패턴 구간 인덱스
 
     private bool _isInvincible = false;             // 무적 상태 여부
     private float _shootTimer = 0f;                 // 패턴 발사 타이머
-    private const float _shootInterval = 2.5f;      // 패턴 발사 간격 (초)
+    private float _shootInterval = 2.5f;            // 패턴 발사 간격 (BossPhase.ShootInterval로 페이즈마다 갱신)
 
     private MovePattern _currentMovePattern;                   // 보스의 이동 패턴 (추가)
 
     public event GameAction OnDied;                 // 보스가 죽었을 때 발생하는 이벤트
 
     public Boss(Scene scene, int hp, float startX, float startY,
-                StageData.BossPhase[] phases) : base(scene)
+                StageData.BossPhase[] phases, BossType type) : base(scene)
     {
         Name = "Boss";
         X = startX;
         Y = startY;
         _maxHp = hp;
+        _bType = type;
         _currentHp = hp;
         _phases = phases;
         _isInvincible = true;   // 스폰 직후 무적 (첫 발사 전까지)
-        _currentMovePattern = phases[0].Move; // 초기 이동 패턴 설정
+        _currentMovePattern = phases[0].Move;           // 초기 이동 패턴 설정
+        _shootInterval = phases[0].ShootInterval > 0f   // 첫 페이즈 발사 간격 설정
+            ? phases[0].ShootInterval : _shootInterval;
     }
 
     public override void Update(float deltaTime)
@@ -55,7 +60,9 @@ internal class Boss : GameObject
         if (nextPhase != _phaseIndex)
         {
             _phaseIndex = nextPhase;
-            _currentMovePattern = _phases[_phaseIndex].Move; // 이동 패턴 업데이트
+            _currentMovePattern = _phases[_phaseIndex].Move;    // 이동 패턴 업데이트
+            if (_phases[_phaseIndex].ShootInterval > 0f)        // 페이즈별 발사 간격 적용
+                _shootInterval = _phases[_phaseIndex].ShootInterval;
             _isInvincible = true;
             _shootTimer = 0f;
         }
@@ -78,13 +85,39 @@ internal class Boss : GameObject
 
     public override void Draw(ScreenBuffer buffer)
     {
-        if (X >= Wall.Left && X <= Wall.Right
-            && Y >= Wall.Top && Y <= Wall.Bottom)
+        
+        if (X < Wall.Left || X > Wall.Right || Y < Wall.Top || Y > Wall.Bottom) return;
+
+        var color = _isInvincible ? ConsoleColor.DarkGray : _bType switch
         {
-            var color = _isInvincible ? ConsoleColor.DarkGray : ConsoleColor.Magenta; // 무적 상태는 어두운 회색, 일반 상태는 마젠타
-            buffer.SetCell((int)X, (int)Y, 'B', color);
-            buffer.SetCell((int)X - 1, (int)Y, 'W', color);
-            buffer.SetCell((int)X + 1, (int)Y, 'W', color);
+            BossType.BossA => ConsoleColor.Cyan,
+            BossType.BossB => ConsoleColor.Magenta, // 기존 색상 유지
+            BossType.BossC => ConsoleColor.Yellow,  // 새로운 보스 타입 색상
+            _ => ConsoleColor.White,
+        };
+
+        switch (_bType)
+        {
+            case BossType.BossA:
+                buffer.SetCell((int)X, (int)Y, 'A', color);
+                buffer.SetCell((int)X - 1, (int)Y, '<', color);
+                buffer.SetCell((int)X + 1, (int)Y, '>', color);
+                break;
+            case BossType.BossB:
+                buffer.SetCell((int)X, (int)Y, 'B', color);
+                buffer.SetCell((int)X - 1, (int)Y, 'O', color);
+                buffer.SetCell((int)X + 1, (int)Y, 'O', color);
+                break;
+            case BossType.BossC:
+                buffer.SetCell((int)X, (int)Y, 'C', color);
+                    buffer.SetCell((int)X - 1, (int)Y, 'X', color);
+                    buffer.SetCell((int)X + 1, (int)Y, 'X', color);
+                    break;
+            default: // Heavy, Normal
+                buffer.SetCell((int)X, (int)Y, 'D', color);
+                buffer.SetCell((int)X - 1, (int)Y, 'M', color);
+                buffer.SetCell((int)X + 1, (int)Y, 'M', color);
+                break;
         }
     }
 
@@ -98,3 +131,5 @@ internal class Boss : GameObject
         }
     }
 }
+
+public enum BossType { BossA, BossB , BossC}

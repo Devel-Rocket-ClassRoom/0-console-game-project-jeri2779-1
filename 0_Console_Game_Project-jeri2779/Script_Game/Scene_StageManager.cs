@@ -8,12 +8,16 @@ internal class StageManager
 {
     private readonly Scene _scene;
     private readonly GameData _gameData;
+    
+   
+
 
     private StagePhase _phase = StagePhase.Waiting;
     private float _phaseTimer = 0f;
     private float _bossTimer = 0f;
 
     private float _waveTimer = 0f;
+   
 
     public float _waveTimeRemains => CurrentStage.Waves[_currentWave].WaveTime - _waveTimer; // 현재 웨이브 남은 시간 계산
     public float _phaseTimeRemains => CurrentStage.WaitTime - _phaseTimer; // 다음 웨이브 스폰까지 남은 시간 계산
@@ -131,20 +135,37 @@ internal class StageManager
         _phaseTimer = 0f;           // 타이머 초기화
         _phase = StagePhase.Waiting;// 대기 단계로 전환
     }
-    private void SpawnWave(int waveIndex)                                   // 웨이브 스폰 메서드
+    private void SpawnWave(int waveIndex)                                                           // 웨이브 스폰 메서드*
     {
-        var wave = CurrentStage.Waves[waveIndex];                           // 웨이브 정보
-        int spacing = (Wall.Right - Wall.Left) / (wave.EnemyCount + 1);     // 적 간격 계산
+        var wave = CurrentStage.Waves[waveIndex];                                                   // 웨이브 정보
+        int spacing = (Wall.Right - Wall.Left) / (wave.EnemyCount + 1);                             // 적 간격 계산
+
+
         for (int i = 0; i < wave.EnemyCount; i++)
         {
-            float spawnX = Wall.Left + spacing * (i + 1);                   // 스폰 위치 X 계산
+            float spawnX;                                                                           // 스폰 위치 X 계산
+            float spawnY;                                                                           // 스폰 위치 Y 계산
 
-            var pattern = wave.Patterns[i % wave.Patterns.Length];          // 웨이브 패턴 선택
-            var enemy = new Enemy(_scene, wave.EnemyHP, spawnX, Wall.Top, 
-                                 pattern, wave.Move); // 적 객체 생성
+            if (wave.SpawnFromSide)
+            {
+                spawnX = Wall.Left;                                                                 // 왼쪽 벽에서 등장
+                spawnY = Wall.Top + (Wall.Bottom - Wall.Top) / (wave.EnemyCount + 1) * (i + 1);     // Y는 균등 분배
+            }
+            else
+            {
+                spawnX = Wall.Left + spacing * (i + 1);                                             // 기존 - 위에서 스폰
+                spawnY = wave.SpawnY;
+            }
 
-             OnEnemySpawned?.Invoke(enemy); // 적이 스폰될 때마다 이벤트 호출
-            _scene.AddGameObject(enemy); // 씬에 적 추가
+            var pattern = wave.Patterns[i % wave.Patterns.Length];
+            var movePattern = wave.MoveFactory?.Invoke();
+            movePattern?.SetOffset(i);                                                              // MovePattern이 존재하면 인덱스에 따른 오프셋 설정
+
+            var enemy = new Enemy(_scene, wave.EnemyHP, spawnX, spawnY,
+                                 pattern, movePattern, wave.EnemyType, wave.ShootInterval);                                             // 적 객체 생성
+
+             OnEnemySpawned?.Invoke(enemy);                                                         // 적이 스폰될 때마다 이벤트 호출
+            _scene.AddGameObject(enemy);                                                            // 씬에 적 추가
         }
     }
 
@@ -152,7 +173,7 @@ internal class StageManager
     {
         var bossWave = CurrentStage.BossWave;
         float centerX = (Wall.Left + Wall.Right) / 2f;
-        var boss = new Boss(_scene, bossWave.EnemyHP, centerX, Wall.Top, bossWave.Phases);
+        var boss = new Boss(_scene, bossWave.EnemyHP, centerX, Wall.Top, bossWave.Phases, bossWave.BossType);
 
         OnBossSpawned?.Invoke(boss);
         _scene.AddGameObject(boss);

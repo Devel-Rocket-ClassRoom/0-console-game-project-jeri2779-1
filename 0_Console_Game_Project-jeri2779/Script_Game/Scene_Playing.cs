@@ -62,71 +62,71 @@ public class Playing : Scene
 
     public override void Draw(ScreenBuffer buffer)
     {
-        //wall.Draw(buffer); // 벽 그리기
-        // 게임 씬 그리기 로직 
         DrawGameObjects(buffer);
-        if(!_isStageClear && !_isAllClear && _player.IsActive)// 스테이지 클리어·올 클리어·리스폰 대기 중이 아닐 때만 플레이어 그리기
+        if (!_isStageClear && !_isAllClear && _player.IsActive) // 플레이어는 반드시 마지막에 그리기 (총알이 덮는 것 방지)
         {
-            _player.Draw(buffer); // 플레이어 그리기(항상 마지막)
+            _player.Draw(buffer);
         }
-        //_player.Draw(buffer); // 플레이어 그리기(항상 마지막)
 
-         
-        //플레이어는 반드시 마지막에 그리도록 해야함(총알이 플레이어 덮는것 방지)
+        // === HUD Row 0: Life | Stage | Score ===
+        buffer.SetCell(20, 0, '|', ConsoleColor.DarkGray); // 구분선
+        buffer.SetCell(39, 0, '|', ConsoleColor.DarkGray); // 구분선
+
+        ConsoleColor lifeColor = _respawnTimer > 0f  ? ConsoleColor.DarkGray
+                               : _invincibleTimer > 0f ? ConsoleColor.White
+                               : ConsoleColor.Cyan;
+        buffer.WriteText(1, 0, $"[Life: {_gameData.Life}]", lifeColor);
+        buffer.WriteTextCentered(0, $"Stage {_gameData.Stage}", ConsoleColor.Magenta);
+        string scoreText = $"Score: {_gameData.Score}";
+        buffer.WriteText(58 - scoreText.Length, 0, scoreText, ConsoleColor.Green);
+
+        // === HUD Row 1: 상황별 타이머 ===
         if (_respawnTimer > 0f)
         {
-            buffer.WriteText(1, 0, $"Life: {_gameData.Life}  Respawn: {(int)_respawnTimer + 1}s", ConsoleColor.Gray);  // 리스폰 대기 카운트다운
+            buffer.WriteTextCentered(1, $"Respawn: {(int)_respawnTimer + 1}s", ConsoleColor.DarkGray);
         }
-        else if (_invincibleTimer > 0f)
+        else if (_stageManager.Phase == StageManager.StagePhase.BossFight)
         {
-            buffer.WriteText(1, 0, $"Life: {_gameData.Life} !!!", ConsoleColor.White); // 무적 중 표시
+            string bossText = $"Boss: {(int)_stageManager._bossTimeRemains}s";
+            buffer.WriteText(58 - bossText.Length, 1, bossText, ConsoleColor.Red);
         }
-        else
+        else if (_stageManager.Phase == StageManager.StagePhase.WaveSpawn)
         {
-            buffer.WriteText(1, 0, $"Life: {_gameData.Life}", ConsoleColor.Cyan);
+            string waveText = $"Wave: {(int)_stageManager._waveTimeRemains}s";
+            buffer.WriteText(58 - waveText.Length, 1, waveText, ConsoleColor.Yellow);
         }
 
-        buffer.WriteText(1, 1, $"Score: {_gameData.Score}", ConsoleColor.Green);
-        buffer.WriteText(22, 1, $"Stage: {_gameData.Stage}", ConsoleColor.Magenta);
+        // === Overlay (공통 박스 위치: x=14, y=6, w=32) ===
+        const int bx = 14, by = 6, bw = 32;
 
-        if(_stageManager.Phase == StageManager.StagePhase.BossFight)
+        if (_isGameOver)
         {
-            buffer.WriteText(40, 0, $"Boss Time: {(int)_stageManager._bossTimeRemains}s", ConsoleColor.Red);
+            buffer.DrawBox(bx, by, bw, 9, ConsoleColor.Red);
+            buffer.WriteTextCentered(by + 2, "GAME  OVER", ConsoleColor.Red);
+            buffer.WriteTextCentered(by + 4, $"Score: {_gameData.Score}", ConsoleColor.Yellow);
+            buffer.WriteTextCentered(by + 6, "[ ENTER ]  Retry", ConsoleColor.White);
         }
-
-        if (_stageManager.Phase == StageManager.StagePhase.WaveSpawn)
+        else if (_isAllClear)
         {
-            buffer.WriteText(40, 0, $"Wave: {(int)_stageManager._waveTimeRemains}s", ConsoleColor.Yellow);
+            buffer.DrawBox(bx, by, bw, 9, ConsoleColor.Yellow);
+            buffer.WriteTextCentered(by + 2, "All  Stages  Clear!", ConsoleColor.Yellow);
+            buffer.WriteTextCentered(by + 4, $"Score: {_gameData.Score}", ConsoleColor.Green);
+            buffer.WriteTextCentered(by + 6, "[ ENTER ]  Play Again", ConsoleColor.White);
         }
-
-        if (_isGameOver)//게임 오버 상태 화면
+        else if (_isStageClear)
         {
-            buffer.WriteTextCentered(8, "Game Over", ConsoleColor.Red);
-            buffer.WriteTextCentered(10, $"Total Score: {_gameData.Score}", ConsoleColor.Yellow);
-            buffer.WriteTextCentered(12, "ENTER to Retry", ConsoleColor.White);
+            buffer.DrawBox(bx, by, bw, 9, ConsoleColor.Cyan);
+            buffer.WriteTextCentered(by + 2, $"Stage {_gameData.Stage - 1}  Clear!", ConsoleColor.Yellow);
+            buffer.WriteTextCentered(by + 4, $"Score: {_gameData.Score}   Kills: {_killCount}", ConsoleColor.Green);
+            int countdown = Math.Max(0, (int)(_stageWaitTime - _stageTimer) + 1);
+            buffer.WriteTextCentered(by + 6, $"Next Stage in {countdown}s...", ConsoleColor.White);
         }
-
-        if (_isAllClear)//모든 스테이지 클리어 상태 화면
+        else if (_stageManager.Phase == StageManager.StagePhase.Waiting && !_isAllClear && !_isGameOver)
         {
-            buffer.WriteTextCentered(8, "All Stages Clear!", ConsoleColor.Yellow);
-            buffer.WriteTextCentered(10, $"Total Score: {_gameData.Score}", ConsoleColor.Green);
-            buffer.WriteTextCentered(12, "ENTER to Re-Play", ConsoleColor.White);
+            buffer.DrawBox(bx, by, bw, 7, ConsoleColor.DarkCyan);
+            buffer.WriteTextCentered(by + 2, $"Stage {_gameData.Stage}  Start!", ConsoleColor.Yellow);
+            buffer.WriteTextCentered(by + 4, $"Ready...  {(int)_stageManager._phaseTimeRemains + 1}s", ConsoleColor.Green);
         }
-
-        if (_isStageClear)
-        {
-            buffer.WriteTextCentered(8, $"Stage {_gameData.Stage - 1} Clear!", ConsoleColor.Yellow);
-            buffer.WriteTextCentered(10, $"Score: {_gameData.Score}", ConsoleColor.Green);
-            buffer.WriteTextCentered(12, $"Kills: {_killCount}", ConsoleColor.White);
-            
-        }
-        else if(_stageManager.Phase == StageManager.StagePhase.Waiting && !_isAllClear && !_isGameOver)
-        {
-            buffer.WriteTextCentered(8, $"Stage {_gameData.Stage} Start!", ConsoleColor.Yellow);
-            buffer.WriteTextCentered(14, $"Time Remaining: {(int)_stageManager._phaseTimeRemains + 1:F1}s", ConsoleColor.Green);
-
-        }
-        //throw new NotImplementedException();
     }
    
     public override void Load() //Awake()
@@ -354,5 +354,68 @@ public class Playing : Scene
     }
 
 
+
+    //public void Collision() // 충돌 감지 — 겹침 확인 후 처리 메서드 호출
+    //{
+    //    var bullets = FindGameObjectsAll("Player_Bullet");
+    //    var enemies = FindGameObjectsAll("Enemy");
+    //    var bosses = FindGameObjectsAll("Boss");
+    //    var enemyBullets = FindGameObjectsAll("Enemy_Bullet");
+
+    //    // 플레이어 탄 vs 적 / 보스
+    //    foreach (var bullet in bullets)
+    //    {
+    //        foreach (var enemy in enemies)
+    //        {
+    //            if (IsHit(bullet, enemy)) { OnPlayerBulletHitEnemy(bullet, enemy); break; }
+    //        }
+    //        foreach (var boss in bosses)
+    //        {
+    //            if (IsHit(bullet, boss)) { OnPlayerBulletHitBoss(bullet, boss); break; }
+    //        }
+    //    }
+
+    //    // 적 탄 vs 플레이어
+    //    if (_player != null && _player.IsActive && _invincibleTimer <= 0f)
+    //    {
+    //        foreach (var bullet in enemyBullets)
+    //        {
+    //            if (IsHit(bullet, _player)) { OnEnemyBulletHitPlayer(bullet); break; }
+    //        }
+    //    }
+    //}
+
+    //// ── 충돌 판정 ──────────────────────────────────────────────────
+    //private bool IsHit(GameObject a, GameObject b)
+    //    => Math.Abs(a.X - b.X) <= 1f && Math.Abs(a.Y - b.Y) <= 1f;
+
+    //// ── 충돌 처리 ──────────────────────────────────────────────────
+    //private void OnPlayerBulletHitEnemy(GameObject bullet, GameObject enemy)// 플레이어 총알이 적과 충돌했을 때 처리하는 메서드
+    //{
+    //    RemoveGameObject(bullet);
+    //    if (enemy is Enemy enm) enm.TakeDamage(_player.AttackDamage);
+    //}
+
+    //private void OnPlayerBulletHitBoss(GameObject bullet, GameObject boss)// 플레이어 총알이 보스와 충돌했을 때 처리하는 메서드
+    //{
+    //    RemoveGameObject(bullet);
+    //    if (boss is Boss b) b.TakeDamage(_player.AttackDamage);
+    //}
+
+    //private void OnEnemyBulletHitPlayer(GameObject bullet)              // 적 총알이 플레이어와 충돌했을 때 처리하는 메서드
+    //{
+    //    RemoveGameObject(bullet);
+    //    _gameData.Life--;
+    //    if (_gameData.Life <= 0)
+    //    {
+    //        _isGameOver = true;
+    //        ClearState();
+    //    }
+    //    else
+    //    {
+    //        _player.IsActive = false;
+    //        _respawnTimer = _respawnDelay;
+    //    }
+    //}
 }       
 

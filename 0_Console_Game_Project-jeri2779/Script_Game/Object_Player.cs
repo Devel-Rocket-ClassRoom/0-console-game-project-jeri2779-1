@@ -24,7 +24,7 @@ namespace Framework.Engine
 
 
         private float _shootTimer;                                  // 총알 발사 타이머
-        private const float _shootInterval = 0.1f;                  // 총알 발사 간격 (초)
+        private const float _shootInterval = 0.3f;                  // 총알 발사 간격 (초)
  
 
         public Player(Scene scene, int startX, int startY) : base(scene)
@@ -38,7 +38,7 @@ namespace Framework.Engine
         public override void Draw(ScreenBuffer buffer)
         {
             buffer.SetCell((int)X, (int)Y, '@', ConsoleColor.Green);
-            buffer.SetCell((int)X, (int)Y + 1, '@', ConsoleColor.Green);
+            //buffer.SetCell((int)X, (int)Y + 1, '@', ConsoleColor.Green);
 
 
             //throw new NotImplementedException();
@@ -65,22 +65,24 @@ namespace Framework.Engine
                 _shootTimer = 0;                        // 총알 발사 타이머 초기화
                 bullet = new Bullet(Scene, X, Y - 1, 0, -1, SpeedY + 1, "Player_Bullet"); // 총알 생성 (플레이어 바로 위)
                 Scene.AddGameObject(bullet);            // 총알을 씬에 추가
-                //bullet = new Bullet(Scene, X, Y - 1, -0.5f, -1, SpeedY + 1, "Player_Bullet"); // 왼쪽 대각선
+                bullet = new Bullet(Scene, X, Y - 1, -0.5f, -1, SpeedY + 1, "Player_Bullet"); // 왼쪽 대각선
 
-                //Scene.AddGameObject(bullet);            // 총알을 씬에 추가
-                //bullet = new Bullet(Scene, X, Y - 1, 0.5f, -1, SpeedY + 1, "Player_Bullet"); // 오른쪽 대각선
-                //Scene.AddGameObject(bullet);
+                Scene.AddGameObject(bullet);            // 총알을 씬에 추가
+                bullet = new Bullet(Scene, X, Y - 1, 0.5f, -1, SpeedY + 1, "Player_Bullet"); // 오른쪽 대각선
+                Scene.AddGameObject(bullet);
             }
         }
         public void Move(float deltaTime)
         {
-            // 입력 방향(_dirX, _dirY) + 속도와 deltaTime을 곱해줌
-             
-            float nextX = X + (_dirX * SpeedX * deltaTime);
-            float nextY = Y + (_dirY * SpeedY * deltaTime);
 
-            // 3. 벽 충돌 검사 (float 좌표로 정밀하게 체크)
-            // 캐릭터의 크기(Width/Height)가 있다면 여기에서 가감해줍니다.
+            float speed = Input.IsKey(ConsoleKey.Spacebar) ? SpeedX * 0.3f : SpeedX; // Space키로 저속
+            // 입력 방향(_dirX, _dirY) + 속도와 deltaTime을 곱해줌
+
+            float nextX = X + (_dirX * speed * deltaTime);
+            float nextY = Y + (_dirY * speed * deltaTime);
+
+            // 3. 벽 충돌 검사 
+            
             if (nextX >= Wall.Left && nextX <= Wall.Right)
             {
                 X = nextX;

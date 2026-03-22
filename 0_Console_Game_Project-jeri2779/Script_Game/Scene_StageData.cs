@@ -8,15 +8,24 @@ internal class StageData
 {
     internal class WaveData// 웨이브 정보 클래스
     {
+
+        public EnemyType EnemyType { get; set; } = EnemyType.EnemyA;
+        public BossType BossType { get; set; } = BossType.BossA; // 보스 웨이브에서 사용할 보스 타입
         public int EnemyCount { get; set; }             // 웨이브당 적의 수
         public float WaveTime { get; set; }             // 웨이브 지속 시간
 
+        public float SpawnY { get; set; } = Wall.Top;   // 기본값 Wall.Top (위에서 스폰)
+        public bool SpawnFromSide { get; set; } = false; // 옆에서 스폰 여부
+
         public int EnemyHP { get; set; }                 // 적의 체력   
         public float ShootInterval { get; set; }        // 적이 총알을 발사하는 간격
+
+        
         //public Action<Scene, float, float>[] Patterns;  // 적의 총알 발사 패턴을 정의
         public BulletPattern[] Patterns { get; set; }  // 적의 총알 발사 패턴 배열
         public BossPhase[] Phases { get; set; }              // 보스 웨이브에서 각 패턴이 적용되는 페이즈
-        public MovePattern Move { get; set; }          // 이동 방식
+        //public MovePattern Move { get; set; }          // 이동 방식
+        public Func<MovePattern> MoveFactory { get; set; }   // 이동 패턴 팩토리 (추가)
     }
 
     internal class StageInfo// 스테이지 정보 클래스
@@ -29,152 +38,525 @@ internal class StageData
     internal class BossPhase// 보스 페이즈 정보 클래스
     {
         public float HpThreshold { get; set; }           // 보스 체력 임계값 (0~1 사이)
-        //public Action<Scene, float, float> Patterns;  // 해당 페이즈에서 적용되는 총알 패턴
-        public BulletPattern[] Patterns { get; set; }  // 해당 페이즈에서 적용되는 총알 패턴 배열
-        public MovePattern Move { get; set; }          // 이동 (추가)
+        public BulletPattern[] Patterns { get; set; }    // 해당 페이즈에서 적용되는 총알 패턴 배열
+        public MovePattern Move { get; set; }            // 이동 패턴
+        public float ShootInterval { get; set; } = 2.0f; // 페이즈별 발사 간격 (기본 2.0f)
     }
 
-    public static StageInfo[] All { get; } = new StageInfo[] // 모든 스테이지 정보
+    
+
+    public static StageInfo[] All { get; } = new StageInfo[]
     {
         Stage1(),
         Stage2(),
         Stage3(),
+        Stage4(),
+        Stage5(),
     };
 
-    private static StageInfo Stage1() => new StageInfo      //밑의 StageInfo 정보 생성
+ 
+    private static StageInfo Stage1() => new StageInfo
     {
-        // 스테이지 1 
         WaitTime = 2f,
         Waves = new WaveData[]
         {
-            new WaveData
-            {
-                EnemyCount = 2,
-                WaveTime = 30f,
-                EnemyHP = 3,
-                //Patterns = new Action<Scene, float, float>[] { BPatterns.Spread3 },
-                Patterns = new BulletPattern[] { new Spread3Pattern() },
-                Move = new DescendAndStop(8.0f, 5.0f)
-            },
-            new WaveData
-            {
-                EnemyCount = 3,
-                WaveTime = 30f,
-                EnemyHP = 4,
-                //Patterns = new Action<Scene, float, float>[] { BPatterns.SpreadAimedAuto },
-                Patterns = new BulletPattern[] { new Spread5Pattern() },
-
-                Move = new SideToSide(5.0f)
-            },
+        new WaveData  
+        {
+            EnemyCount = 2,
+            EnemyType = EnemyType.EnemyA,
+            WaveTime = 30f,
+            EnemyHP = 3,
+            ShootInterval = 3.0f,
+            Patterns = new BulletPattern[] { new Spread3Pattern() },
+            MoveFactory = () => new DescendAndStop(6f, 5f),
+        },
+        new WaveData // W2: SideToSide + NWayPattern(3)
+        {
+            EnemyCount = 3,
+            EnemyType = EnemyType.EnemyA,
+            WaveTime = 30f,
+            EnemyHP = 4,
+            ShootInterval = 2.5f,
+            Patterns = new BulletPattern[] { new NWayPattern(3, 60f) },
+            MoveFactory = () => new SideToSide(4f, 8f),
+        },
         },
         BossWave = new WaveData
         {
             EnemyCount = 1,
+            BossType = BossType.BossA,
             WaveTime = 60f,
-            EnemyHP = 10,
+            EnemyHP = 12,
             Phases = new BossPhase[]
-             
             {
-                new BossPhase { HpThreshold = 1.0f, Patterns = new BulletPattern[] { new Spread3Pattern() }, Move = new DescendAndStop(7.0f, 5.0f) },
-                new BossPhase { HpThreshold = 0.7f, Patterns = new BulletPattern[] { new Circle8Pattern() }, Move = new SideToSide(5.0f) },
-                new BossPhase { HpThreshold = 0.4f, Patterns = new BulletPattern[] { new Spread5Pattern() }, Move = new SideToSide(5.0f) },
+                new BossPhase { HpThreshold = 1.0f, ShootInterval = 2.5f,
+                    Patterns = new BulletPattern[] { new AimedPattern() },
+                    Move = new DescendAndStop(7f, 5f) },
+                new BossPhase { HpThreshold = 0.6f, ShootInterval = 2.0f,
+                    Patterns = new BulletPattern[] { new Spread5Pattern() },
+                    Move = new SideToSide(5f, 10f) },
             }
         },
     };
 
+   
     private static StageInfo Stage2() => new StageInfo
     {
-        // 스테이지 2
         WaitTime = 2f,
         Waves = new WaveData[]
         {
-            new WaveData
-            {
-                EnemyCount = 4,
-                WaveTime = 30f,
-                EnemyHP = 5,
-                Patterns = new BulletPattern[] { new Spread3Pattern() }
-            },
-            new WaveData
-            {
-                EnemyCount = 5,
-                WaveTime = 30f,
-                EnemyHP = 6,
-                Patterns = new BulletPattern[] { new Spread5Pattern(), new Circle8Pattern()  },
-                Move = new SideToSide(5.0f)
-            },
+        new WaveData // W1: ZigZag + AimedPattern
+        {
+            EnemyCount = 3,
+            EnemyType = EnemyType.EnemyA,
+            WaveTime = 30f,
+            EnemyHP = 5,
+            ShootInterval = 2.5f,
+            Patterns = new BulletPattern[] { new AimedPattern() },
+            MoveFactory = () => new ZigZag(6f, 4f, 14f, 1.2f),
+        },
+        new WaveData // W2: DescendThenSide + NWayAimedPattern(3)
+        {
+            EnemyCount = 4,
+            EnemyType = EnemyType.EnemyB,
+            WaveTime = 30f,
+            EnemyHP = 5,
+            ShootInterval = 2.0f,
+            Patterns = new BulletPattern[] { new NWayAimedPattern(3, 30f) },
+            MoveFactory = () => new DescendThenSide(6f, 6f, 4f, 10f),
+        },
         },
         BossWave = new WaveData
         {
             EnemyCount = 1,
+            BossType = BossType.BossA,
             WaveTime = 60f,
-            EnemyHP = 15,
+            EnemyHP = 18,
             Phases = new BossPhase[]
             {
-                new BossPhase { HpThreshold = 1.0f, Patterns = new BulletPattern[] { new Spread5Pattern() }, Move = new DescendAndStop(7.0f, 3.0f) },
-                new BossPhase { HpThreshold = 0.7f, Patterns = new BulletPattern[] { new Circle8Pattern() }, Move = new SideToSide(5.0f) },
-                new BossPhase { HpThreshold = 0.4f, Patterns = new BulletPattern[] { new Spread3Pattern() }, Move = new SideToSide(5.0f) },
+                new BossPhase { HpThreshold = 1.0f, ShootInterval = 2.0f,
+                    Patterns = new BulletPattern[] { new Cross4Pattern() },
+                    Move = new DescendAndStop(7f, 8f) },
+                new BossPhase { HpThreshold = 0.6f, ShootInterval = 1.8f,
+                    Patterns = new BulletPattern[] { new SpreadAimedPattern() },
+                    Move = new ZigZag(6f, 3f, 8f, 1f) },
+                new BossPhase { HpThreshold = 0.3f, ShootInterval = 1.5f,
+                    Patterns = new BulletPattern[] { new NWayAimedPattern(3, 30f), new NWayPattern(3, 60f) },
+                    Move = new DescendThenSide(5f, 8f, 6f, 12f) },
             }
         },
     };
 
-
-
+   
     private static StageInfo Stage3() => new StageInfo
     {
         WaitTime = 2f,
         Waves = new WaveData[]
-    {
-        // 웨이브 1 - ZigZag 이동 + Spread3
-        new WaveData
+        {
+        new WaveData // W1: CircleMove  + Circle8Pattern
+        {
+            EnemyCount = 4,
+            EnemyType = EnemyType.EnemyB,
+            WaveTime = 30f,
+            EnemyHP = 6,
+            ShootInterval = 2.0f,
+            Patterns = new BulletPattern[] { new Circle8Pattern() },
+            MoveFactory = () => new CircleMove(30f, 8f, 8f, 1.5f),
+        },
+        new WaveData // W2: SideToSide + SpiralPattern —
         {
             EnemyCount = 3,
+            EnemyType = EnemyType.EnemyB,
             WaveTime = 30f,
-            EnemyHP = 5,
-            Patterns = new BulletPattern[] { new Spread3Pattern() },
-            Move = new ZigZag(8.0f, 4.0f, 5.0f)
+            EnemyHP = 6,
+            ShootInterval = 0.12f, 
+            Patterns = new BulletPattern[] { new SpiralPattern(18f, 7f, 90f) },
+            MoveFactory = () => new SideToSide(3f, 8f),  
         },
-        // 웨이브 2 - SideToSide + Spiral (stateful 테스트)
-        new WaveData
-        {
-            EnemyCount = 3,
-            WaveTime = 30f,
-            EnemyHP = 5,
-            Patterns = new BulletPattern[] { new SpiralPattern(30f, 6f) },
-            Move = new SideToSide(5.0f)
         },
-    },
         BossWave = new WaveData
         {
             EnemyCount = 1,
+            BossType = BossType.BossB,
             WaveTime = 60f,
-            EnemyHP = 20,
+            EnemyHP = 25,
             Phases = new BossPhase[]
-        {
-            // 페이즈 1 - DescendAndStop + Spread5 + AimedPattern
-            new BossPhase
             {
-                HpThreshold = 1.0f,
-                Patterns = new BulletPattern[] { new Spread5Pattern(), new AimedPattern() },
-                Move = new DescendAndStop(7.0f, 4.0f)
-            },
-            // 페이즈 2 - SideToSide + Circle8 + SpreadAimed
-            new BossPhase
-            {
-                HpThreshold = 0.7f,
-                Patterns = new BulletPattern[] { new Circle8Pattern(), new SpreadAimedPattern() },
-                Move = new SideToSide(6.0f)
-            },
-            // 페이즈 3 - SideToSide + Spiral (stateful 보스 테스트)
-            new BossPhase
-            {
-                HpThreshold = 0.4f,
-                Patterns = new BulletPattern[] { new SpiralPattern(20f, 8f) },
-                Move = new SideToSide(8.0f)
-            },
-        }
+                new BossPhase { HpThreshold = 1.0f, ShootInterval = 2.0f,
+                    Patterns = new BulletPattern[] { new Circle8Pattern() },
+                    Move = new DescendAndStop(7f, 8f) },
+                new BossPhase { HpThreshold = 0.6f, ShootInterval = 1.8f,
+                    Patterns = new BulletPattern[] { new NWayAimedPattern(5, 45f) },
+                    Move = new PendulumMove(8f, 14f) },
+                new BossPhase { HpThreshold = 0.3f, ShootInterval = 0.13f, // ← 나선
+                    Patterns = new BulletPattern[] { new SpiralPattern(20f, 7f, 90f) },
+                    Move = new SideToSide(3.5f, 9f) }, // ← 나선: 느린 좌우
+            }
         },
     };
 
+ 
+    private static StageInfo Stage4() => new StageInfo
+    {
+        WaitTime = 2f,
+        Waves = new WaveData[]
+        {
+        new WaveData // W1: Figure8Move + BurstAimedPattern  
+        {
+            EnemyCount = 4,
+            EnemyType = EnemyType.EnemyC,
+            WaveTime = 30f,
+            EnemyHP = 8,
+            ShootInterval = 0.22f, // ← 버스트: 0.22f × 3 = 0.66s 주기
+            Patterns = new BulletPattern[] { new BurstAimedPattern(3, 8f) },
+            MoveFactory = () => new Figure8Move(30f, 8f, 12f, 5f, 1.2f),
+        },
+        new WaveData // W2: PendulumMove  + DoubleSpiralPattern 
+        {
+            EnemyCount = 5,
+            EnemyType = EnemyType.EnemyC,
+            WaveTime = 30f,
+            EnemyHP = 8,
+            ShootInterval = 0.13f, // ← 이중나선: 빠른 발사
+            Patterns = new BulletPattern[] { new DoubleSpiralPattern(15f, 7f) },
+            MoveFactory = () => new PendulumMove(4.5f, 10f),  
+        },
+        },
+        BossWave = new WaveData
+        {
+            EnemyCount = 1,
+            BossType = BossType.BossB,
+            WaveTime = 60f,
+            EnemyHP = 30,
+            Phases = new BossPhase[]
+            {
+                new BossPhase { HpThreshold = 1.0f, ShootInterval = 2.0f,
+                    Patterns = new BulletPattern[] { new NWayPattern(7, 80f) },
+                    Move = new DescendAndStop(7f, 8f) },
+                new BossPhase { HpThreshold = 0.6f, ShootInterval = 0.17f, // ← 이중나선+버스트
+                    Patterns = new BulletPattern[] { new BurstAimedPattern(3, 8f), new DoubleSpiralPattern(15f, 7f) },
+                    Move = new Figure8Move(30f, 8f, 12f, 5f, 1.5f) },
+                new BossPhase { HpThreshold = 0.3f, ShootInterval = 1.5f,
+                    Patterns = new BulletPattern[] { new RandomSpreadPattern(6, 8f), new NWayAimedPattern(3, 30f) },
+                    Move = new WaveMove(3f, 1.8f, 10f, 4f) },
+            }
+        },
+    };
 
+  
+    private static StageInfo Stage5() => new StageInfo
+    {
+        WaitTime = 2f,
+        Waves = new WaveData[]
+        {
+        new WaveData // W1: SemiCircleMove + SpiralPattern 
+        {
+            EnemyCount = 5,
+            EnemyType = EnemyType.EnemyC,
+            WaveTime = 30f,
+            EnemyHP = 10,
+            ShootInterval = 0.13f, // ← 나선: 빠른 발사
+            Patterns = new BulletPattern[] { new SpiralPattern(15f, 8f, 90f) },
+            MoveFactory = () => new SemiCircleMove(30f, 8f, 12f, 1.5f), // ← 반원 이동
+        },
+        new WaveData // W2: WaveMove + DoubleSpiralPattern/RandomSpread 교대  
+        {
+            EnemyCount = 5,
+            EnemyType = EnemyType.EnemyC,
+            WaveTime = 30f,
+            EnemyHP = 10,
+            ShootInterval = 0.13f, // ← 이중나선: 빠른 발사
+            Patterns = new BulletPattern[] { new DoubleSpiralPattern(12f, 7f), new RandomSpreadPattern(5, 8f) },
+            MoveFactory = () => new WaveMove(3f, 1.8f, 10f, 4f),
+            SpawnY = 3f,
+        },
+        },
+        BossWave = new WaveData
+        {
+            EnemyCount = 1,
+            BossType = BossType.BossC,
+            WaveTime = 90f,
+            EnemyHP = 40,
+            Phases = new BossPhase[]
+            {
+                new BossPhase { HpThreshold = 1.0f, ShootInterval = 2.0f,
+                    Patterns = new BulletPattern[] { new NWayPattern(7, 80f), new AimedPattern() },
+                    Move = new DescendAndStop(7f, 4f) },
+                new BossPhase { HpThreshold = 0.7f, ShootInterval = 1.8f,
+                    Patterns = new BulletPattern[] { new Circle8Pattern(), new NWayAimedPattern(5, 40f) },
+                    Move = new CircleMove(30f, 8f, 8f, 1.5f) },
+                new BossPhase { HpThreshold = 0.4f, ShootInterval = 0.14f, // ← 이중나선
+                    Patterns = new BulletPattern[] { new DoubleSpiralPattern(15f, 7f) },
+                    Move = new SemiCircleMove(30f, 8f, 12f, 1.5f) },  // ← 느린 반원
+                new BossPhase { HpThreshold = 0.15f, ShootInterval = 0.2f,  
+                    Patterns = new BulletPattern[] { new BurstAimedPattern(3, 9f), new RandomSpreadPattern(6, 8f) },
+                    Move = new Figure8Move(30f, 8f, 6f, 4f, 2.0f) },
+            }
+        },
+    };
+
+    //테스트 진행중 스테이지 구성========================================================================================================
 }
+    //    Waves = new WaveData[]
+    //    {
+    //    new WaveData
+    //    {
+    //        EnemyCount = 3,
+    //        EnemyType = EnemyType.EnemyA,
+    //        WaveTime = 30f,
+    //        EnemyHP = 3,
+    //        ShootInterval = 3.0f,
+    //        Patterns = new BulletPattern[] { new NWayPattern(3) },
+    //        MoveFactory = () => new DescendAndStop(6.0f, 5.0f)
+    //    },
+    //    new WaveData
+    //    {
+    //        EnemyCount = 4,
+    //        EnemyType = EnemyType.EnemyA,
+    //        WaveTime = 30f,
+    //        EnemyHP = 4,
+    //        ShootInterval = 3.0f,
+    //        Patterns = new BulletPattern[] { new NWayPattern(5) },
+    //        MoveFactory = () => new SideToSide(4.0f, 8.0f)
+    //    },
+    //    },
+    //    BossWave = new WaveData
+    //    {
+    //        EnemyCount = 1,
+    //        BossType = BossType.BossA,
+    //        WaveTime = 60f,
+    //        EnemyHP = 15,
+    //        ShootInterval = 2.5f,
+    //        Phases = new BossPhase[]
+    //        {
+        
+    //        new BossPhase { HpThreshold = 1.0f,
+    //            Patterns = new BulletPattern[] { new NWayPattern(3) },
+    //            Move = new DescendAndStop(7.0f, 8.0f) },
+           
+    //        new BossPhase { HpThreshold = 0.5f,
+    //            Patterns = new BulletPattern[] { new NWayPattern(5) },
+    //            Move = new SideToSide(6.0f, 12.0f) },
+    //        }
+    //    },
+    //};
+
+   
+    //private static StageInfo Stage2() => new StageInfo
+    //{
+    //    WaitTime = 2f,
+    //    Waves = new WaveData[]
+    //    {
+    //    new WaveData
+    //    {
+    //        EnemyCount = 3,
+    //        EnemyType = EnemyType.EnemyA,
+    //        WaveTime = 30f,
+    //        EnemyHP = 5,
+    //        ShootInterval = 2.5f,
+    //        Patterns = new BulletPattern[] { new AimedPattern() },
+    //        MoveFactory = () => new ZigZag(6.0f, 4.0f, 14.0f, 1.2f)
+    //    },
+    //    new WaveData
+    //    {
+    //        EnemyCount = 4,
+    //        EnemyType = EnemyType.EnemyB,
+    //        WaveTime = 30f,
+    //        EnemyHP = 5,
+    //        ShootInterval = 2.5f,
+    //        Patterns = new BulletPattern[] { new NWayAimedPattern(3) },
+    //        MoveFactory = () => new DescendThenSide(6.0f, 6.0f, 4.0f, 10.0f)
+    //    },
+    //    },
+    //    BossWave = new WaveData
+    //    {
+    //        EnemyCount = 1,
+    //        BossType = BossType.BossA,
+    //        WaveTime = 60f,
+    //        EnemyHP = 20,
+    //        ShootInterval = 2.5f,
+    //        Phases = new BossPhase[]
+    //        {
+          
+    //        new BossPhase { HpThreshold = 1.0f,
+    //            Patterns = new BulletPattern[] { new Cross4Pattern() },
+    //            Move = new DescendAndStop(7.0f, 8.0f) },
+           
+    //        new BossPhase { HpThreshold = 0.6f,
+    //            Patterns = new BulletPattern[] { new AimedPattern(), new NWayPattern(3) },
+    //            Move = new ZigZag(6.0f, 3.0f, 8.0f, 1.0f) },
+             
+    //        new BossPhase { HpThreshold = 0.3f,
+    //            Patterns = new BulletPattern[] { new NWayAimedPattern(3) },
+    //            Move = new DescendThenSide(5.0f, 8.0f, 6.0f, 12.0f) },
+    //        }
+    //    },
+    //};
+
+  
+    //private static StageInfo Stage3() => new StageInfo
+    //{
+    //    WaitTime = 2f,
+    //    Waves = new WaveData[]
+    //    {
+    //    new WaveData
+    //    {
+    //        EnemyCount = 4,
+    //        EnemyType = EnemyType.EnemyB,
+    //        WaveTime = 30f,
+    //        EnemyHP = 6,
+    //        ShootInterval = 2.0f,
+    //        Patterns = new BulletPattern[] { new Circle8Pattern() },
+    //        MoveFactory = () => new CircleMove(30f, 8f, 8f, 1.5f)
+    //    },
+    //    new WaveData
+    //    {
+    //        EnemyCount = 4,
+    //        EnemyType = EnemyType.EnemyB,
+    //        WaveTime = 30f,
+    //        EnemyHP = 6,
+    //        ShootInterval = 0.15f,   
+    //        Patterns = new BulletPattern[] { new SpiralPattern(15f, 7f, 90f) },
+    //        MoveFactory = () => new PendulumMove(14.0f, 12.0f)
+    //    },
+    //    },
+    //    BossWave = new WaveData
+    //    {
+    //        EnemyCount = 1,
+    //        BossType = BossType.BossB,
+    //        WaveTime = 60f,
+    //        EnemyHP = 25,
+    //        ShootInterval = 2.0f,
+    //        Phases = new BossPhase[]
+    //        {
+         
+    //        new BossPhase { HpThreshold = 1.0f,
+    //            Patterns = new BulletPattern[] { new Circle8Pattern() },
+    //            Move = new DescendAndStop(7.0f, 8.0f) },
+           
+    //        new BossPhase { HpThreshold = 0.6f,
+    //            Patterns = new BulletPattern[] { new NWayAimedPattern(5, 45f) },
+    //            Move = new CircleMove(30f, 8f, 10f, 1.5f) },
+            
+    //        new BossPhase { HpThreshold = 0.3f,
+    //            Patterns = new BulletPattern[] { new SpiralPattern(12f, 7f, 90f) },
+    //            Move = new PendulumMove(18.0f, 14.0f) },
+    //        }
+    //    },
+    //};
+
+ 
+    //private static StageInfo Stage4() => new StageInfo
+    //{
+    //    WaitTime = 2f,
+    //    Waves = new WaveData[]
+    //    {
+    //    new WaveData
+    //    {
+    //        EnemyCount = 4,
+    //        EnemyType = EnemyType.EnemyC,
+    //        WaveTime = 30f,
+    //        EnemyHP = 8,
+    //        ShootInterval = 0.25f,   
+    //        Patterns = new BulletPattern[] { new BurstAimedPattern(3, 8f) },
+    //        MoveFactory = () => new Figure8Move(30f, 8f, 12f, 5f, 1.2f)
+    //    },
+    //    new WaveData
+    //    {
+    //        EnemyCount = 5,
+    //        EnemyType = EnemyType.EnemyC,
+    //        WaveTime = 30f,
+    //        EnemyHP = 8,
+    //        ShootInterval = 1.8f,
+    //        Patterns = new BulletPattern[] { new RandomSpreadPattern(5, 7f) },
+    //        MoveFactory = () => new WaveMove(3.0f, 1.5f, 14.0f, 4.0f)
+    //    },
+    //    },
+    //    BossWave = new WaveData
+    //    {
+    //        EnemyCount = 1,
+    //        BossType = BossType.BossB,
+    //        WaveTime = 60f,
+    //        EnemyHP = 30,
+    //        ShootInterval = 1.8f,
+    //        Phases = new BossPhase[]
+    //        {
+           
+    //        new BossPhase { HpThreshold = 1.0f,
+    //            Patterns = new BulletPattern[] { new NWayPattern(7) },
+    //            Move = new DescendAndStop(7.0f, 8.0f) },
+           
+    //        new BossPhase { HpThreshold = 0.6f,
+    //            Patterns = new BulletPattern[] { new BurstAimedPattern(3, 8f) , new DoubleSpiralPattern(12f, 7f) },
+    //            Move = new Figure8Move(30f, 8f, 12f, 5f, 1.5f) },
+            
+    //        new BossPhase { HpThreshold = 0.3f,
+    //            Patterns = new BulletPattern[] { new RandomSpreadPattern(6, 8f), new NWayAimedPattern(3) , new },
+    //            Move = new WaveMove(4.0f, 2.0f, 14.0f, 5.0f) },
+    //        }
+    //    },
+    //};
+
+    //// ─────────────────────────────────────────────
+    //// Stage 5 — 최종. SemiCircleMove + DoubleSpiral 총동원
+    //// 이동: SemiCircleMove + 기존 복합
+    //// 탄막: DoubleSpiralPattern + 복합
+    //// ─────────────────────────────────────────────
+    //private static StageInfo Stage5() => new StageInfo
+    //{
+    //    WaitTime = 2f,
+    //    Waves = new WaveData[]
+    //    {
+    //    new WaveData
+    //    {
+    //        EnemyCount = 5,
+    //        EnemyType = EnemyType.EnemyC,
+    //        WaveTime = 30f,
+    //        EnemyHP = 10,
+    //        ShootInterval = 0.35f,  // Spiral 연속
+    //        Patterns = new BulletPattern[] { new SpiralPattern(12f, 8f, 90f) },
+    //        MoveFactory = () => new SemiCircleMove(30f, 8f, 12f, 1.5f)
+    //    },
+    //    new WaveData
+    //    {
+    //        EnemyCount = 5,
+    //        EnemyType = EnemyType.EnemyC,
+    //        WaveTime = 30f,
+    //        EnemyHP = 10,
+    //        ShootInterval = 1.5f,
+    //        Patterns = new BulletPattern[] { new NWayAimedPattern(5, 45f), new RandomSpreadPattern(4, 8f) },
+    //        MoveFactory = () => new WaveMove(3.5f, 1.8f, 14.0f, 5.0f),
+    //        SpawnY = 3f
+    //    },
+    //    },
+    //    BossWave = new WaveData
+    //    {
+    //        EnemyCount = 1,
+    //        BossType = BossType.BossC,
+    //        WaveTime = 90f,
+    //        EnemyHP = 40,
+    //        ShootInterval = 1.3f,
+    //        Phases = new BossPhase[]
+    //        {
+    //        // 페이즈1 - 하강 + NWay7 + Aimed
+    //        new BossPhase { HpThreshold = 1.0f,
+    //            Patterns = new BulletPattern[] { new NWayPattern(7), new AimedPattern() },
+    //            Move = new DescendAndStop(7.0f, 8.0f) },
+    //        // 페이즈2 - SemiCircle + Circle8 + NWayAimed
+    //        new BossPhase { HpThreshold = 0.7f,
+    //            Patterns = new BulletPattern[] { new Circle8Pattern(), new NWayAimedPattern(5) },
+    //            Move = new SemiCircleMove(30f, 8f, 12f, 1.5f) },
+    //        // 페이즈3 - Figure8 + DoubleSpiral (내려온 위치 활용)
+    //        new BossPhase { HpThreshold = 0.4f,
+    //            Patterns = new BulletPattern[] { new DoubleSpiralPattern(12f, 7f) },
+    //            Move = new Figure8Move(30f, 8f, 12f, 5f, 1.5f) },
+    //        // 페이즈4 분노 - WaveMove + DoubleSpiral + BurstAimed
+    //        new BossPhase { HpThreshold = 0.15f,
+    //            Patterns = new BulletPattern[] { new DoubleSpiralPattern(10f, 9f), new BurstAimedPattern(3, 9f) },
+    //            Move = new WaveMove(4.0f, 2.0f, 14.0f, 5.0f) },
+    //        }
+    //    },
+    //};
+
+
+
