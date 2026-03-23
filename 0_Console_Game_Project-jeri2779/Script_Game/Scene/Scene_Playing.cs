@@ -117,7 +117,7 @@ public class Playing : Scene
         {
             buffer.DrawBox(bx, by, bw, 9, ConsoleColor.Cyan);
             buffer.WriteTextCentered(by + 2, $"Stage {_gameData.Stage - 1}  Clear!", ConsoleColor.Yellow);
-            buffer.WriteTextCentered(by + 4, $"Score: {_gameData.Score}   Kills: {_killCount}", ConsoleColor.Green);
+            buffer.WriteTextCentered(by + 4, $"Score: {_gameData.Score}   Eliminates: {_killCount}", ConsoleColor.Green);
             int countdown = Math.Max(0, (int)(_stageWaitTime - _stageTimer) + 1);
             buffer.WriteTextCentered(by + 6, $"Next Stage in {countdown}s...", ConsoleColor.White);
         }
