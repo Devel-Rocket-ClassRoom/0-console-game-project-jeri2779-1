@@ -351,67 +351,6 @@ public class Playing : Scene
 
 
 
-    //public void Collision() // 충돌 감지 — 겹침 확인 후 처리 메서드 호출
-    //{
-    //    var bullets = FindGameObjectsAll("Player_Bullet");
-    //    var enemies = FindGameObjectsAll("Enemy");
-    //    var bosses = FindGameObjectsAll("Boss");
-    //    var enemyBullets = FindGameObjectsAll("Enemy_Bullet");
-
-    //    // 플레이어 탄 vs 적 / 보스
-    //    foreach (var bullet in bullets)
-    //    {
-    //        foreach (var enemy in enemies)
-    //        {
-    //            if (IsHit(bullet, enemy)) { OnPlayerBulletHitEnemy(bullet, enemy); break; }
-    //        }
-    //        foreach (var boss in bosses)
-    //        {
-    //            if (IsHit(bullet, boss)) { OnPlayerBulletHitBoss(bullet, boss); break; }
-    //        }
-    //    }
-
-    //    // 적 탄 vs 플레이어
-    //    if (_player != null && _player.IsActive && _invincibleTimer <= 0f)
-    //    {
-    //        foreach (var bullet in enemyBullets)
-    //        {
-    //            if (IsHit(bullet, _player)) { OnEnemyBulletHitPlayer(bullet); break; }
-    //        }
-    //    }
-    //}
-
-    //// ── 충돌 판정 ──────────────────────────────────────────────────
-    //private bool IsHit(GameObject a, GameObject b)
-    //    => Math.Abs(a.X - b.X) <= 1f && Math.Abs(a.Y - b.Y) <= 1f;
-
-    //// ── 충돌 처리 ──────────────────────────────────────────────────
-    //private void OnPlayerBulletHitEnemy(GameObject bullet, GameObject enemy)// 플레이어 총알이 적과 충돌했을 때 처리하는 메서드
-    //{
-    //    RemoveGameObject(bullet);
-    //    if (enemy is Enemy enm) enm.TakeDamage(_player.AttackDamage);
-    //}
-
-    //private void OnPlayerBulletHitBoss(GameObject bullet, GameObject boss)// 플레이어 총알이 보스와 충돌했을 때 처리하는 메서드
-    //{
-    //    RemoveGameObject(bullet);
-    //    if (boss is Boss b) b.TakeDamage(_player.AttackDamage);
-    //}
-
-    //private void OnEnemyBulletHitPlayer(GameObject bullet)              // 적 총알이 플레이어와 충돌했을 때 처리하는 메서드
-    //{
-    //    RemoveGameObject(bullet);
-    //    _gameData.Life--;
-    //    if (_gameData.Life <= 0)
-    //    {
-    //        _isGameOver = true;
-    //        ClearState();
-    //    }
-    //    else
-    //    {
-    //        _player.IsActive = false;
-    //        _respawnTimer = _respawnDelay;
-    //    }
-    //}
+     
 }       
 
