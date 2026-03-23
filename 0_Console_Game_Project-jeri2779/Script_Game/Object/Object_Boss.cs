@@ -110,8 +110,8 @@ internal class Boss : GameObject
                 break;
             case BossType.BossC:
                 buffer.SetCell((int)X, (int)Y, 'C', color);
-                    buffer.SetCell((int)X - 1, (int)Y, 'X', color);
-                    buffer.SetCell((int)X + 1, (int)Y, 'X', color);
+                    buffer.SetCell((int)X - 1, (int)Y, '▽', color);
+                    buffer.SetCell((int)X + 1, (int)Y, '▽', color);
                     break;
             default: // Heavy, Normal
                 buffer.SetCell((int)X, (int)Y, 'D', color);
