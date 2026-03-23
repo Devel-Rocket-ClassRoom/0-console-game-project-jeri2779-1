@@ -37,7 +37,7 @@ namespace Framework.Engine
         }
         public override void Draw(ScreenBuffer buffer)
         {
-            buffer.SetCell((int)X, (int)Y, '@', ConsoleColor.Green);
+            buffer.SetCell((int)X, (int)Y, '△', ConsoleColor.Green);
             //buffer.SetCell((int)X, (int)Y + 1, '@', ConsoleColor.Green);
 
 
