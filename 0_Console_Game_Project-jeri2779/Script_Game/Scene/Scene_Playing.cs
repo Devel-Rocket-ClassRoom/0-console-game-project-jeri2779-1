@@ -298,11 +298,7 @@ public class Playing : Scene
                     {
                         enm.TakeDamage(_player.AttackDamage);
                     }
-                    //체력 시스템을 구현할시 remove를 다른곳에서 하고 대신 대미지 관련 로직을 넣을수도 있음
-                    //RemoveGameObject(enemy);
-
-                    //_gameData.Score += 10;
-                    //_killCount++;
+                  
                     break;                              // 한 총알이 여러 적과 충돌하는 것을 방지하기 위해 내부 루프 탈출
                 }
             }
