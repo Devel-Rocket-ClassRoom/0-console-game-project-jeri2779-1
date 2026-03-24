@@ -103,7 +103,7 @@ internal class StageManager
             _phase = StagePhase.BossSpawn;                              // 모든 웨이브가 끝나면 보스 스폰 단계로 전환
         }
     }
-    private void UpdateBossSpawn(float deltaTime)
+    private void UpdateBossSpawn(float deltaTime)//
     {
         SpawnBoss();                                                    // 보스 스폰
         _phase = StagePhase.BossFight;                                  // 보스 전투 단계로 전환
